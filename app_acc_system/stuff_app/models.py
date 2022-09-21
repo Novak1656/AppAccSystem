@@ -2,6 +2,7 @@ from django.contrib.auth.base_user import AbstractBaseUser
 from django.contrib.auth.models import BaseUserManager, PermissionsMixin
 from django.core.validators import MinLengthValidator
 from django.db import models
+from django.urls import reverse_lazy
 from phonenumber_field.modelfields import PhoneNumberField
 
 
@@ -37,13 +38,14 @@ class StuffUsers(AbstractBaseUser, PermissionsMixin):
                                 max_length=255, unique=True, blank=False, null=False)
     first_name = models.CharField(verbose_name='Фамилия', max_length=255, null=True, blank=False)
     second_name = models.CharField(verbose_name='Имя', max_length=255, null=True, blank=False)
-    last_name = models.CharField(verbose_name='Отчество', max_length=255, blank=True)
+    last_name = models.CharField(verbose_name='Отчество', max_length=255, null=True, blank=True)
     role = models.CharField(verbose_name='Роль', choices=ROLES, max_length=10, null=False, blank=False)
     email = models.EmailField(verbose_name='Электронная почта', unique=True, null=True, blank=False)
-    phone = PhoneNumberField(verbose_name='Номер телефона', null=True, blank=False, unique=True)
+    phone = PhoneNumberField(verbose_name='Номер телефона', region='RU', null=True, blank=False, unique=True)
     status = models.CharField(verbose_name='Статус', choices=STATUSES, max_length=10, default='Active')
     created_at = models.DateTimeField(verbose_name='Дата добавления', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Дата изменения', auto_now=True)
+
     objects = UserManager()
 
     USERNAME_FIELD = 'username'
@@ -54,7 +56,12 @@ class StuffUsers(AbstractBaseUser, PermissionsMixin):
         verbose_name_plural = 'Сотрудники'
         ordering = ['-status']
 
+    def get_absolute_url(self):
+        return reverse_lazy('stuff_detail', kwargs={'username': self.username})
+
     def get_full_name(self):
+        if self.last_name:
+            return f"{self.first_name} {self.second_name} {self.last_name}"
         return f"{self.first_name} {self.second_name}"
 
     def get_short_name(self):
@@ -69,4 +76,4 @@ class StuffUsers(AbstractBaseUser, PermissionsMixin):
         return True if self.status == 'Active' else False
 
     def __str__(self):
-        return f"{self.get_full_name()}: {self.role}"
+        return f"{self.username}: {self.role}"

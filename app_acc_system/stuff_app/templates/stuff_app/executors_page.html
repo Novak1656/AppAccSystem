@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load stuff_tags %}
+
+{% block title %} Исполнители {% endblock %}
+
+{% block content %}
+<div class="container text-white border-info">
+    <div class="border-bottom border-info">
+        <h1 class="display-6 mb-3">Исполнители | <a href="{% url 'stuff_create' %}" class="btn btn-outline-info btn-lg text-end">Добавить сотрудника</a></h1>
+    </div>
+    <br>
+    <div class="container">
+        <div class="row">
+            {% for executor in executors %}
+            <div class="col">
+                <div class="card h-100 bg-dark border border-info rounded">
+                    <div class="card-title text-center">
+                        <h3>{{ executor.get_full_name }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>Роль: {{ executor.role|role_normalize }}</li>
+                            <li>Логин: {{ executor.username }}</li>
+                            <li>Email: {{ executor.email }}</li>
+                            <li>Телефон: {{ executor.phone }}</li>
+                        </ul>
+                    </div>
+                    {% if request.user.is_staff %}
+                    <div class="card-footer">
+                        <div class="d-flex align-items-center">
+                            <a href="{{ executor.get_absolute_url }}" class="btn btn-info w-100">Редактировать</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
