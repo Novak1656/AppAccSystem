@@ -33,18 +33,19 @@ class StuffUsers(AbstractBaseUser, PermissionsMixin):
     STATUSES = [('Active', 'Активный'), ('Archive', 'Архивный')]
     ROLES = [('admin', 'Администратор'), ('dispatcher', 'Диспетчер'), ('executor', 'Исполнитель')]
 
-    username = models.CharField(verbose_name='Логин', max_length=255, unique=True, null=False, blank=False)
+    username = models.CharField(verbose_name='Логин', max_length=255, unique=True, blank=False)
     password = models.CharField(verbose_name='Пароль', validators=[MinLengthValidator(8)],
-                                max_length=255, unique=True, blank=False, null=False)
-    first_name = models.CharField(verbose_name='Фамилия', max_length=255, null=True, blank=False)
-    second_name = models.CharField(verbose_name='Имя', max_length=255, null=True, blank=False)
-    last_name = models.CharField(verbose_name='Отчество', max_length=255, null=True, blank=True)
-    role = models.CharField(verbose_name='Роль', choices=ROLES, max_length=10, null=False, blank=False)
+                                max_length=255, unique=True, blank=False)
+    first_name = models.CharField(verbose_name='Фамилия', max_length=255, blank=False)
+    second_name = models.CharField(verbose_name='Имя', max_length=255, blank=False)
+    last_name = models.CharField(verbose_name='Отчество', max_length=255, blank=True)
+    role = models.CharField(verbose_name='Роль', choices=ROLES, max_length=10, blank=False)
     email = models.EmailField(verbose_name='Электронная почта', unique=True, null=True, blank=False)
     phone = PhoneNumberField(verbose_name='Номер телефона', region='RU', null=True, blank=False, unique=True)
     status = models.CharField(verbose_name='Статус', choices=STATUSES, max_length=10, default='Active')
     created_at = models.DateTimeField(verbose_name='Дата добавления', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Дата изменения', auto_now=True)
+    is_active = models.BooleanField(default=True)
 
     objects = UserManager()
 
@@ -71,9 +72,8 @@ class StuffUsers(AbstractBaseUser, PermissionsMixin):
     def is_staff(self):
         return True if self.role == 'admin' else False
 
-    @property
-    def is_active(self):
-        return True if self.status == 'Active' else False
+    def is_archive(self):
+        return True if self.status == 'Archive' else False
 
     def __str__(self):
         return f"{self.username}: {self.role}"

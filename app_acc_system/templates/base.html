@@ -13,26 +13,31 @@
 
 <body class="bg-dark">
 
-<header class="mb-auto">
-        <div class="d-flex flex-column flex-md-row align-items-center pb-3  border-bottom">
-            <a href="/" class="d-flex align-items-center text-white text-decoration-none">
-                <span class="fs-3">&nbspApplication accounting system</span>
+<header>
+    <nav class="navbar navbar-expand-xl navbar-dark bg-dark" aria-label="Sixth navbar example">
+        <div class="container-fluid container border-bottom border-info">
+            <a class="navbar-brand display-6" href="">
+                <span class="fs-3">Application accounting system</span>
             </a>
+            <button class="navbar-toggler collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#navbarsExample06" aria-controls="navbarsExample06" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
 
-            <nav class="d-inline-flex mt-4 mt-md-0 ms-md-auto text-font='Roboto'">
-                <a class="nav nav-link me-3 py-2 text-white text-decoration-none" href="/">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-house-door" viewBox="0 0 16 16">
-                        <path d="M8.354 1.146a.5.5 0 0 0-.708 0l-6 6A.5.5 0 0 0 1.5 7.5v7a.5.5 0 0 0 .5.5h4.5a.5.5 0 0 0 .5-.5v-4h2v4a.5.5 0 0 0 .5.5H14a.5.5 0 0 0 .5-.5v-7a.5.5 0 0 0-.146-.354L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.354 1.146zM2.5 14V7.707l5.5-5.5 5.5 5.5V14H10v-4a.5.5 0 0 0-.5-.5h-3a.5.5 0 0 0-.5.5v4H2.5z"/>
-                    </svg>
-                </a>
-                <a class="nav nav-link me-3 py-2 text-white text-decoration-none" href="{% url 'stuff_list' %}">Исполнители</a>
+            <div class="navbar-collapse collapse" id="navbarsExample06" style="">
+                <ul class="navbar-nav me-auto mb-2 mb-xl-0 justify-content-center mx-auto">
+                    <li class="nav-item mx-1">
+                        <a class="nav-link active" aria-current="page" href="">Home</a>
+                    </li>
+                    <li class="nav-item mx-1">
+                        <a class="nav-link" href="{% url 'stuff_list' %}">Исполнители</a>
+                    </li>
+                </ul>
 
                 <a class="nav nav-link me-3 py-2 text-white text-decoration-none" href="" data-bs-toggle="modal" data-bs-target="#exit">
                     <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-person-x-fill" viewBox="0 0 16 16">
                         <path fill-rule="evenodd" d="M1 14s-1 0-1-1 1-4 6-4 6 3 6 4-1 1-1 1H1zm5-6a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm6.146-2.854a.5.5 0 0 1 .708 0L14 6.293l1.146-1.147a.5.5 0 0 1 .708.708L14.707 7l1.147 1.146a.5.5 0 0 1-.708.708L14 7.707l-1.146 1.147a.5.5 0 0 1-.708-.708L13.293 7l-1.147-1.146a.5.5 0 0 1 0-.708z"/>
                     </svg>
                 </a>
-
 
                 <!-- Modal Exit -->
                 <div class="modal fade" id="exit" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -53,9 +58,11 @@
                     </div>
                 </div>
                 <!-- Modal Exit -->
-            </nav>
+            </div>
         </div>
+    </nav>
 </header>
+
 
 <main>
     <div class="bg-dark">

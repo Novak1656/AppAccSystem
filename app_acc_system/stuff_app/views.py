@@ -2,7 +2,6 @@ from django.contrib import messages
 from django.contrib.auth import login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.forms import PasswordChangeForm
-from django.contrib.auth.hashers import check_password
 from django.contrib.auth.mixins import AccessMixin
 from django.contrib.auth.models import Group
 from django.http import Http404
@@ -111,12 +110,9 @@ def stuff_user_delete(request, user_pk):
 def stuff_user_auth(request):
     if request.method == 'POST':
         form = StuffUserLoginForm(data=request.POST)
-        print(request.POST)
         if form.is_valid():
             user = form.get_user()
-# Нихуя блять не работает эта ёбаная параша если сменить статус пользователю блять
-            if not user.is_active:
-                print('op')
+            if user.is_archive():
                 messages.error(request, 'Ваша учетная запись заблокирована, обратитесь к администратору системы')
             else:
                 login(request, user)

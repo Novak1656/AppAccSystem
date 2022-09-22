@@ -1,15 +1,8 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>{% block title %}{% endblock %}</title>
-    <meta name="viewport"
-          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
-    <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.1/dist/css/bootstrap.min.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.3.0/font/bootstrap-icons.css"/>
-</head>
-<body class="container bg-dark">
+{% extends "stuff_app/auth_page_base.html" %}
+
+{% block title %}Welcome{% endblock %}
+
+{% block content %}
 <div class="container position-absolute top-50 start-50 translate-middle">
     <div class="text-center">
         <h1 class="display-3 text-info">Application Accounting<br>System</h1>
@@ -25,13 +18,14 @@
             {% endfor %}
         </ul>
         {% endif %}
+
         <form role="search" method="post" class="mt-2">
             {% csrf_token %}
             {{ form.as_p }}
             <div class="container text-center border-top border-info">
                 <input type="submit" class="btn btn-outline-info btn-lg mt-3 mb-2 w-50" value="Войти">
                 <br>
-                <a href="" class="mt-3 text-decoration-none text-white">Забыл пароль</a>
+                <a href="{% url 'password_reset' %}" class="mt-3 text-decoration-none text-white">Забыл пароль</a>
             </div>
         </form>
     </div>
@@ -40,10 +34,4 @@
         <p class="text-muted">@acclrtrrr</p>
     </div>
 </div>
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.0.0-beta3/dist/js/bootstrap.bundle.min.js" integrity="sha384-JEW9xMcG8R+pH31jmWH6WWP0WintQrMb4s7ZOdauHnUtxwoG2vI5DkLtS3qm9Ekf" crossorigin="anonymous"></script>
-</body>
-</html>
-
-
-
-
+{% endblock %}

@@ -6,7 +6,12 @@
 {% block content %}
 <div class="container text-white border-info">
     <div class="border-bottom border-info">
-        <h1 class="display-6 mb-3">Исполнители | <a href="{% url 'stuff_create' %}" class="btn btn-outline-info btn-lg text-end">Добавить сотрудника</a></h1>
+        <h1 class="display-6 mb-3">
+            Исполнители
+            {% if request.user.is_staff %}
+            | <a href="{% url 'stuff_create' %}" class="btn btn-outline-info btn-lg text-end">Добавить сотрудника</a>
+            {% endif %}
+        </h1>
     </div>
     <br>
     <div class="container">
