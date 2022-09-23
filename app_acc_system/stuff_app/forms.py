@@ -1,41 +1,11 @@
 from django import forms
 from django.contrib.auth.forms import AuthenticationForm
 from django.core.exceptions import ValidationError
-from phonenumber_field.formfields import PhoneNumberField
 from phonenumber_field.widgets import PhoneNumberPrefixWidget
-
 from .models import StuffUsers
 
 
 class StuffUserCreateForm(forms.ModelForm):
-    username = forms.CharField(
-        label='Логин',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите логин...'})
-    )
-    first_name = forms.CharField(
-        label='Фамилия',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите фамилию...'})
-    )
-    second_name = forms.CharField(
-        label='Имя',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите имя...'})
-    )
-    last_name = forms.CharField(
-        label='Отчество',
-        widget=forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите отчество (при наличии)...'})
-    )
-    role = forms.CharField(
-        label='Роль',
-        widget=forms.Select(choices=StuffUsers.ROLES, attrs={'class': 'form-control'})
-    )
-    email = forms.EmailField(
-        label='Адрес эл. почты',
-        widget=forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Введите email...'})
-    )
-    phone = PhoneNumberField(
-        label='Номер телефона',
-        widget=PhoneNumberPrefixWidget(initial='RU', attrs={'class': 'form-control', 'placeholder': '89*********'})
-    )
     password1 = forms.CharField(
         label='Пароль',
         widget=forms.PasswordInput(attrs={'class': 'form-control', 'placeholder': 'Введите пароль...'})
@@ -51,6 +21,15 @@ class StuffUserCreateForm(forms.ModelForm):
             'username', 'first_name', 'second_name', 'last_name',
             'role', 'email', 'phone', 'password1', 'password2'
         ]
+        widgets = {
+            'username': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите логин...'}),
+            'first_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите фамилию...'}),
+            'second_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите имя...'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control', 'placeholder': 'Введите отчество (при наличии)...'}),
+            'role': forms.Select(choices=StuffUsers.ROLES, attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control', 'placeholder': 'Введите email...'}),
+            'phone': PhoneNumberPrefixWidget(initial='RU', attrs={'class': 'form-control', 'placeholder': '79*********'}),
+        }
 
     def clean_password2(self):
         password1 = self.cleaned_data.get("password1")
