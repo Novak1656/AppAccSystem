@@ -4,9 +4,8 @@ from ..models import StuffUsers
 
 
 class StuffUsersModelTestCase(TestCase):
-    @classmethod
-    def setUpTestData(cls):
-        StuffUsers.objects.create_user(
+    def setUp(self):
+        self.user = StuffUsers.objects.create_user(
             username='DefaultUser',
             password='default_some_password_12345',
             first_name='Novikov',
@@ -19,8 +18,7 @@ class StuffUsersModelTestCase(TestCase):
         )
 
     def test_username_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('username')
+        user_meta = self.user._meta.get_field('username')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Логин')
         field_length = user_meta.max_length
@@ -31,8 +29,7 @@ class StuffUsersModelTestCase(TestCase):
         self.assertFalse(field_blank)
 
     def test_password_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('password')
+        user_meta = self.user._meta.get_field('password')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Пароль')
         field_validators = user_meta.validators
@@ -45,8 +42,7 @@ class StuffUsersModelTestCase(TestCase):
         self.assertFalse(field_blank)
 
     def test_first_name_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('first_name')
+        user_meta = self.user._meta.get_field('first_name')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Фамилия')
         field_length = user_meta.max_length
@@ -55,8 +51,7 @@ class StuffUsersModelTestCase(TestCase):
         self.assertFalse(field_blank)
 
     def test_second_name_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('second_name')
+        user_meta = self.user._meta.get_field('second_name')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Имя')
         field_length = user_meta.max_length
@@ -65,8 +60,7 @@ class StuffUsersModelTestCase(TestCase):
         self.assertFalse(field_blank)
 
     def test_last_name_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('last_name')
+        user_meta = self.user._meta.get_field('last_name')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Отчество')
         field_length = user_meta.max_length
@@ -75,8 +69,7 @@ class StuffUsersModelTestCase(TestCase):
         self.assertTrue(field_blank)
 
     def test_role_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('role')
+        user_meta = self.user._meta.get_field('role')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Роль')
         field_length = user_meta.max_length
@@ -88,8 +81,7 @@ class StuffUsersModelTestCase(TestCase):
         self.assertEqual(field_choices, choices_list)
 
     def test_email_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('email')
+        user_meta = self.user._meta.get_field('email')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Электронная почта')
         field_unique = user_meta.unique
@@ -100,8 +92,7 @@ class StuffUsersModelTestCase(TestCase):
         self.assertFalse(field_blank)
 
     def test_phone_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('phone')
+        user_meta = self.user._meta.get_field('phone')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Номер телефона')
         field_region = user_meta.region
@@ -114,8 +105,7 @@ class StuffUsersModelTestCase(TestCase):
         self.assertTrue(field_unique)
 
     def test_status_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('status')
+        user_meta = self.user._meta.get_field('status')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Статус')
         field_choices = user_meta.choices
@@ -127,23 +117,21 @@ class StuffUsersModelTestCase(TestCase):
         self.assertEqual(field_default, 'Active')
 
     def test_created_at_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('created_at')
+        user_meta = self.user._meta.get_field('created_at')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Дата добавления')
         field_auto_now_add = user_meta.auto_now_add
         self.assertTrue(field_auto_now_add)
 
     def test_updated_at_field(self):
-        user = StuffUsers.objects.get(pk=1)
-        user_meta = user._meta.get_field('updated_at')
+        user_meta = self.user._meta.get_field('updated_at')
         field_label = user_meta.verbose_name
         self.assertEqual(field_label, 'Дата изменения')
         field_auto_now = user_meta.auto_now
         self.assertTrue(field_auto_now)
 
     def test_model_meta_attrs(self):
-        model_meta = StuffUsers._meta
+        model_meta = self.user._meta
         field_label = model_meta.verbose_name
         self.assertEqual(field_label, 'Сотрудник')
         field_label_plural = model_meta.verbose_name_plural
@@ -153,14 +141,12 @@ class StuffUsersModelTestCase(TestCase):
         self.assertEqual(field_ordering, ordering_list)
 
     def test_user_get_absolute_url(self):
-        user = StuffUsers.objects.get(pk=1)
-        absolute_url = f"/stuff/{user.username}/detail/"
-        self.assertEqual(user.get_absolute_url(), absolute_url)
+        absolute_url = f"/stuff/{self.user.username}/detail/"
+        self.assertEqual(self.user.get_absolute_url(), absolute_url)
 
     def test_user_get_full_name(self):
-        user = StuffUsers.objects.get(pk=1)
-        full_name = f"{user.first_name} {user.second_name} {user.last_name}"
-        self.assertEqual(user.get_full_name(), full_name)
+        full_name = f"{self.user.first_name} {self.user.second_name} {self.user.last_name}"
+        self.assertEqual(self.user.get_full_name(), full_name)
         user2 = StuffUsers.objects.create_superuser(
             username='admin1', password='admin1',
             first_name='Volkov', second_name='Alex'
@@ -169,22 +155,18 @@ class StuffUsersModelTestCase(TestCase):
         self.assertEqual(user2.get_full_name(), full_name_without_last_name)
 
     def test_user_get_short_name(self):
-        user = StuffUsers.objects.get(pk=1)
-        short_name = f"{user.second_name}"
-        self.assertEqual(user.get_short_name(), short_name)
+        short_name = f"{self.user.second_name}"
+        self.assertEqual(self.user.get_short_name(), short_name)
 
     def test_user_is_staff(self):
-        user = StuffUsers.objects.get(pk=1)
-        self.assertFalse(user.is_staff)
+        self.assertFalse(self.user.is_staff)
 
     def test_user_is_archive(self):
-        user = StuffUsers.objects.get(pk=1)
-        self.assertFalse(user.is_archive())
+        self.assertFalse(self.user.is_archive())
 
     def test_user_str(self):
-        user = StuffUsers.objects.get(pk=1)
-        true_str = f'{user.username}: {user.role}'
-        self.assertEqual(str(user), true_str)
+        true_str = f'{self.user.username}: {self.user.role}'
+        self.assertEqual(str(self.user), true_str)
 
     def test_create_super_user(self):
         user = StuffUsers.objects.create_superuser(username='admin', password='admin')

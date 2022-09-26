@@ -42,6 +42,11 @@ class StuffUsersListView(AccessMixin, ListView):
     template_name = 'stuff_app/executors_page.html'
     context_object_name = 'executors'
     login_url = reverse_lazy('stuff_user_auth')
+    
+    def dispatch(self, request, *args, **kwargs):
+        if request.user.role == 'executor':
+            raise Http404
+        return super(StuffUsersListView, self).dispatch(request, *args, **kwargs)
 
 
 @login_required
@@ -108,6 +113,8 @@ def stuff_user_delete(request, user_pk):
 
 
 def stuff_user_auth(request):
+    if request.user.is_authenticated:
+        return redirect('stuff_list')
     if request.method == 'POST':
         form = StuffUserLoginForm(data=request.POST)
         if form.is_valid():

@@ -23,7 +23,12 @@ class StuffUserCreateFormTestCase(TestCase):
     def test_role_field(self):
         form = StuffUserCreateForm()
         self.assertEqual(form.fields['role'].label, 'Роль')
-        roles = [('', '---------'), ('admin', 'Администратор'), ('dispatcher', 'Диспетчер'), ('executor', 'Исполнитель')]
+        roles = [
+            ('', '---------'),
+            ('admin', 'Администратор'),
+            ('dispatcher', 'Диспетчер'),
+            ('executor', 'Исполнитель')
+        ]
         self.assertEqual(roles, form.fields['role'].widget.choices)
 
     def test_email_field(self):
@@ -104,8 +109,12 @@ class StuffUserInfoFormTestCase(TestCase):
     def test_role_field(self):
         form = StuffUserInfoForm()
         self.assertEqual(form.fields['role'].label, 'Роль')
-        roles = [('', '---------'), ('admin', 'Администратор'), ('dispatcher', 'Диспетчер'),
-                 ('executor', 'Исполнитель')]
+        roles = [
+            ('', '---------'),
+            ('admin', 'Администратор'),
+            ('dispatcher', 'Диспетчер'),
+            ('executor', 'Исполнитель')
+        ]
         self.assertEqual(roles, form.fields['role'].widget.choices)
 
     def test_email_field(self):
