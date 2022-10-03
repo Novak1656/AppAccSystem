@@ -1,11 +1,13 @@
+from django.core.validators import FileExtensionValidator
 from django.db import models
+from django.urls import reverse_lazy
 from phonenumber_field.modelfields import PhoneNumberField
 from django_unique_slugify import unique_slugify, slugify
 from unidecode import unidecode
 
 
 def user_files_directory_path(instance, filename):
-    return f'User_files/{instance.client.username}/{filename}'
+    return f'User_files/{instance.client.name}/{filename}'
 
 
 def contract_files_directory_path(instance, filename):
@@ -205,6 +207,9 @@ class ContactPersons(models.Model):
     @property
     def get_full_name(self):
         return f"{self.first_name} {self.second_name} {self.last_name}"
+
+    def get_absolute_url(self):
+        return reverse_lazy('cp_detail', kwargs={'pk': self.pk})
 
     def __str__(self):
         return self.get_full_name
@@ -444,6 +449,9 @@ class Clients(models.Model):
         verbose_name = 'Клиент'
         verbose_name_plural = 'Клиенты'
         ordering = ['-created_at']
+
+    def get_absolute_url(self):
+        return reverse_lazy('client_detail', kwargs={'client_slug': self.slug})
 
     def save(self, *args, **kwargs):
         if not self.pk:

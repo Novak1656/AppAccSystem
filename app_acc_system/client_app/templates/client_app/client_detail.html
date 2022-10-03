@@ -1,0 +1,138 @@
+{% extends 'base.html' %}
+{% load stuff_tags %}
+
+{% block title %} Клиент | {{ client.name }} {% endblock %}
+
+{% block content %}
+<div class="container text-white w-50">
+    <div class="row mt-3">
+        <div class="col-4 border border-info rounded">
+            <div class="border-bottom border-info mt-3 text-center">
+                <h1 class="fs-3">{{ client.name }}</h1>
+                {% if client.second_name != '' %}
+                <h1 class="fs-5 text-muted border-top border-secondary">{{ client.second_name }}</h1>
+                {% endif %}
+            </div>
+            <div class="container text-center mt-4 mb-3 d-flex flex-column border-bottom border-info">
+                <a href="" class="btn btn-outline-info btn-lg w-100">Договоры <span class="badge bg-danger rounded">{{ client.ct_count }}</span></a>
+                <br>
+                <a href="" class="btn btn-outline-info btn-lg w-100">Оборудования <span class="badge bg-danger rounded">{{ client.eq_count }}</span></a>
+                <br>
+                <a href="{% url 'cp_list' client.slug %}" class="btn btn-outline-info btn-lg w-100">Контактные лица <span class="badge bg-danger rounded">{{ client.cp_count }}</span></a>
+                <br>
+            </div>
+            <div class="container text-center mt-4 mb-3 d-flex flex-column">
+                <a href="{% url 'client_update' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Редактировать</a>
+                <br>
+                <a href="" class="btn btn-outline-secondary btn-lg w-100">Добавить оборудование</a>
+                <br>
+                <a href="{% url 'cp_create' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить контактное лицо</a>
+                <br>
+                <a href="" class="btn btn-outline-secondary btn-lg w-100">Добавить договор</a>
+                <br>
+                <a href="{% url 'client_create_file' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить файл</a>
+                <br>
+                <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_user{{ executor.pk }}">Удалить клиента</button>
+
+                <!-- Modal Delete -->
+                    <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_user{{ executor.pk }}">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content rounded-4 shadow bg-info text-dark">
+                                <div class="modal-body p-4 text-center">
+                                    <h5 class="mb-0">Вы действительно хотите удалить клиента {{ executor.get_full_name }} из системы?</h5>
+                                </div>
+                                <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
+                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="">Yes</a>
+                                    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <!-- Modal Delete -->
+
+            </div>
+        </div>
+        <div class="col border border-info rounded ms-3">
+            <div class="container border-bottom border-info text-center">
+                <h1 class="fs-1">
+                    Основная информация
+                    <a href="" class="btn btn-outline-info">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
+                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
+                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
+                        </svg>
+                    </a>
+                </h1>
+            </div>
+            <div class="text-white container">
+                <div class="container border-bottom border-info">
+                    <h1 class="fs-1">Контактные данные</h1>
+                    <p class="fs-2">Email: {{ client.email }}</p>
+                    <p class="fs-2">Телефон: {{ client.phone }}</p>
+                    <p class="fs-2">Сайт: {{ client.site }}</p>
+                </div>
+                <div class="container border-bottom border-info">
+                    <h1 class="fs-1">Адреса компании</h1>
+                    <p class="fs-2">Адрес офиса: {{ client.office_address }}</p>
+                    <p class="fs-2">Юридический адрес: {{ client.legal_address }}</p>
+                </div>
+                <div class="container border-bottom border-info">
+                    <h1 class="fs-1">Номера документов</h1>
+                    <p class="fs-2">ИНН: {{ client.inn }}</p>
+                    <p class="fs-2">КПП: {{ client.kpp }}</p>
+                    <p class="fs-2">ОГРН: {{ client.ogrn }}</p>
+                </div>
+                {% if client.note != '' %}
+                <div class="container">
+                    <h1 class="fs-1">Об клиенте</h1>
+                    <p class="fs-2">{{ client.note }}</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="container border-bottom border-info text-center">
+            <h1 class="fs-1">Файлы клиента</h1>
+        </div>
+        <div class="container w-50">
+            {% if client_files %}
+            {% for client_file in client_files %}
+            <div class="col mt-3 text-center">
+                <div class="card bg-dark text-white border-info">
+                    <div class="card-title ms-2">
+                        <h1>{{ client_file.title }}</h1>
+                        <button class="btn btn-close btn-close-white text-right" data-bs-toggle="modal" data-bs-target="#delete_client_file{{ client_file.pk }}" style="position: absolute; right: 5px; top: 5px;"></button>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ client_file.description }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ client_file.file.url }}" class="btn btn-outline-info text-center w-100">Открыть файл</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Delete -->
+            <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_client_file{{ client_file.pk }}">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content rounded-4 shadow bg-info text-dark">
+                        <div class="modal-body p-4 text-center">
+                            <h5 class="mb-0">Вы действительно хотите удалить файл "{{ client_file.title }}" клиента из системы?</h5>
+                        </div>
+                        <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
+                            <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'delete_client_file' client_file.slug %}">Yes</a>
+                            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Delete -->
+            {% endfor %}
+            {% else %}
+            <h1 class="fs-1 text-center mt-3">У данного клиента нет файлов</h1>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

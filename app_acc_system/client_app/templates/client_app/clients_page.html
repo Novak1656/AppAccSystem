@@ -34,7 +34,7 @@
                     {% if request.user.is_staff %}
                     <div class="card-footer">
                         <div class="d-flex align-items-center">
-                            <a href="" class="btn btn-info w-100">Редактировать</a>
+                            <a href="{{ client.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
                         </div>
                     </div>
                     {% endif %}

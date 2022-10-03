@@ -1,14 +1,14 @@
 {% extends 'base.html' %}
 
-{% block title %} Новый клиент {% endblock %}
+{% block title %} Добавление файла клиента {% endblock %}
 
 {% block content %}
 <div class="container text-white">
     <div class="border-bottom border-info">
-        <h1 class="display-6 text-center">Новый клиент</h1>
+        <h1 class="display-6 text-center">Новый файл клиента</h1>
     </div>
     <div class="container w-50 mt-3">
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
             {% csrf_token %}
             {{ form.as_p }}
             <div class="container border-top text-center border-info">

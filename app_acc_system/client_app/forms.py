@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 import requests
-from .models import Clients
+from .models import Clients, ClientFiles, ContactPersons
 from phonenumber_field.widgets import PhoneNumberPrefixWidget
 
 
@@ -44,7 +44,36 @@ class ClientForm(forms.ModelForm):
 
     def clean_site(self):
         site_url = self.cleaned_data['site']
-        resp = requests.head(site_url)
-        if resp.status_code == 404:
+        try:
+            resp = requests.head(site_url)
+            if resp.status_code == 404:
+                raise ValidationError('Указаный адрес сайта не действителен')
+            return site_url
+        except Exception:
             raise ValidationError('Указаный адрес сайта не действителен')
-        return site_url
+
+
+class ClientFilesForms(forms.ModelForm):
+    class Meta:
+        model = ClientFiles
+        fields = ['title', 'description', 'file']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'file': forms.FileInput(attrs={'class': 'form-control'}),
+        }
+
+
+class ContactPersonsForms(forms.ModelForm):
+    class Meta:
+        model = ContactPersons
+        fields = ['first_name', 'second_name', 'last_name', 'post', 'email', 'phone', 'note']
+        widgets = {
+            'first_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'second_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'last_name': forms.TextInput(attrs={'class': 'form-control'}),
+            'post': forms.TextInput(attrs={'class': 'form-control'}),
+            'email': forms.EmailInput(attrs={'class': 'form-control'}),
+            'phone': PhoneNumberPrefixWidget(initial='RU', attrs={'class': 'form-control'}),
+            'note': forms.Textarea(attrs={'class': 'form-control'}),
+        }
