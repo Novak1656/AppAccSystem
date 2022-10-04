@@ -90,7 +90,7 @@ class StuffUserCreateFormTestCase(TestCase):
         form = StuffUserCreateForm(data=data)
         form.is_valid()
         user = form.save()
-        self.assertTrue(StuffUsers.objects.get(pk=1) == user)
+        self.assertTrue(StuffUsers.objects.get(username='DefaultUser') == user)
 
 
 class StuffUserInfoFormTestCase(TestCase):
