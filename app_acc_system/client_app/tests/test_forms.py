@@ -1,6 +1,6 @@
 from django.test import TestCase
-from ..forms import ClientForm
-from ..models import Clients
+from ..forms import ClientForm, ClientFilesForms, ContactPersonsForms
+from ..models import Clients, ClientFiles, ContactPersons
 
 
 class ClientFormTestCase(TestCase):
@@ -51,3 +51,25 @@ class ClientFormTestCase(TestCase):
         form = ClientForm(data=self.data)
         form.is_valid()
         self.assertEqual(form.errors['site'][0], 'Указаный адрес сайта не действителен')
+
+
+class ClientFilesFormsTestCase(TestCase):
+    def test_form_model(self):
+        model = ClientFilesForms._meta.model
+        self.assertEqual(model, ClientFiles)
+
+    def test_form_fields(self):
+        fields = ClientFilesForms._meta.fields
+        field_list = ['title', 'description', 'file']
+        self.assertEqual(fields, field_list)
+
+
+class ContactPersonsFormsTestCase(TestCase):
+    def test_form_model(self):
+        model = ContactPersonsForms._meta.model
+        self.assertEqual(model, ContactPersons)
+
+    def test_form_fields(self):
+        fields = ContactPersonsForms._meta.fields
+        field_list = ['first_name', 'second_name', 'last_name', 'post', 'email', 'phone', 'note']
+        self.assertEqual(fields, field_list)
