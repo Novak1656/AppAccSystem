@@ -11,7 +11,7 @@
                 <h1 class="fs-3">{{ contact_person.get_full_name }}</h1>
             </div>
             <div class="container text-center mt-4 mb-3 d-flex flex-column">
-                <a href="" class="btn btn-outline-secondary btn-lg w-100">Редактировать</a>
+                <a href="{% url 'cp_update' contact_person.pk %}" class="btn btn-outline-secondary btn-lg w-100">Редактировать</a>
                 <br>
                 <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_cp{{ contact_person.pk }}">Удалить контактное лицо</button>
 
@@ -23,7 +23,7 @@
                                     <h5 class="mb-0">Вы действительно хотите удалить контактное лицо {{ contact_person.get_full_name }} из системы?</h5>
                                 </div>
                                 <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
-                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="">Yes</a>
+                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'cp_delete' contact_person.pk %}">Yes</a>
                                     <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
                                 </div>
                             </div>
@@ -47,10 +47,8 @@
                 <p class="fs-2">Email: {{ contact_person.email }}</p>
                 <p class="fs-2">Телефон: {{ contact_person.phone }}</p>
                 {% if contact_person.note != '' %}
-                <div class="container">
-                    <h1 class="fs-1">Об контактном лице</h1>
-                    <p class="fs-2">{{ contact_person.note }}</p>
-                </div>
+                <h1 class="fs-2 border-top border-info">Об контактном лице:</h1>
+                <p class="fs-2">{{ contact_person.note }}</p>
                 {% endif %}
             </div>
         </div>

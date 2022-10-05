@@ -167,3 +167,34 @@ class ContactPersonDetailView(AccessMixin, DetailView):
         if not request.user.is_staff:
             raise Http404
         return super(ContactPersonDetailView, self).dispatch(request, *args, **kwargs)
+
+
+class ContactPersonUpdateView(AccessMixin, UpdateView):
+    model = ContactPersons
+    template_name = 'client_app/contact_persons_update.html'
+    login_url = reverse_lazy('stuff_user_auth')
+    form_class = ContactPersonsForms
+    
+    def get_success_url(self):
+        return reverse_lazy('cp_detail', kwargs={'pk': self.object.pk})
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404
+        return super(ContactPersonUpdateView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(ContactPersonUpdateView, self).get_context_data(**kwargs)
+        context['cp_name'] = self.object.get_full_name
+        context['form'] = self.form_class(instance=self.object)
+        return context
+
+
+@login_required
+def contact_person_delete(request, cp_pk):
+    if not request.user.is_staff:
+        raise Http404
+    cp_obj = ContactPersons.objects.get(pk=cp_pk)
+    client_slug = cp_obj.client.slug
+    cp_obj.delete()
+    return redirect('cp_list', client_slug=client_slug)

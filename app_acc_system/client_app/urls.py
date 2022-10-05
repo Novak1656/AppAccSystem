@@ -18,4 +18,7 @@ urlpatterns = [
          login_required(ContactPersonCreateView.as_view()), name='cp_create'),
     path('contact_persons/detail/<int:pk>/',
          login_required(ContactPersonDetailView.as_view()), name='cp_detail'),
+    path('contact_persons/detail/<int:pk>/update/',
+         login_required(ContactPersonUpdateView.as_view()), name='cp_update'),
+    path('contact_persons/detail/<int:cp_pk>/delete/', contact_person_delete, name='cp_delete'),
 ]

@@ -14,9 +14,9 @@
                 {% endif %}
             </div>
             <div class="container text-center mt-4 mb-3 d-flex flex-column border-bottom border-info">
-                <a href="" class="btn btn-outline-info btn-lg w-100">Договоры <span class="badge bg-danger rounded">{{ client.ct_count }}</span></a>
+                <a href="" class="btn btn-outline-info btn-lg w-100 disabled">Договоры <span class="badge bg-danger rounded">{{ client.ct_count }}</span></a>
                 <br>
-                <a href="" class="btn btn-outline-info btn-lg w-100">Оборудования <span class="badge bg-danger rounded">{{ client.eq_count }}</span></a>
+                <a href="" class="btn btn-outline-info btn-lg w-100 disabled">Оборудования <span class="badge bg-danger rounded">{{ client.eq_count }}</span></a>
                 <br>
                 <a href="{% url 'cp_list' client.slug %}" class="btn btn-outline-info btn-lg w-100">Контактные лица <span class="badge bg-danger rounded">{{ client.cp_count }}</span></a>
                 <br>
@@ -24,15 +24,15 @@
             <div class="container text-center mt-4 mb-3 d-flex flex-column">
                 <a href="{% url 'client_update' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Редактировать</a>
                 <br>
-                <a href="" class="btn btn-outline-secondary btn-lg w-100">Добавить оборудование</a>
+                <a href="" class="btn btn-outline-secondary btn-lg w-100 disabled">Добавить оборудование</a>
                 <br>
                 <a href="{% url 'cp_create' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить контактное лицо</a>
                 <br>
-                <a href="" class="btn btn-outline-secondary btn-lg w-100">Добавить договор</a>
+                <a href="" class="btn btn-outline-secondary btn-lg w-100 disabled">Добавить договор</a>
                 <br>
                 <a href="{% url 'client_create_file' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить файл</a>
                 <br>
-                <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_user{{ executor.pk }}">Удалить клиента</button>
+                <button class="btn btn-outline-danger btn-lg w-100 disabled" data-bs-toggle="modal" data-bs-target="#delete_user{{ executor.pk }}">Удалить клиента</button>
 
                 <!-- Modal Delete -->
                     <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_user{{ executor.pk }}">
@@ -56,7 +56,7 @@
             <div class="container border-bottom border-info text-center">
                 <h1 class="fs-1">
                     Основная информация
-                    <a href="" class="btn btn-outline-info">
+                    <a href="" class="btn btn-outline-info disabled">
                         <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
                             <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
                             <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>

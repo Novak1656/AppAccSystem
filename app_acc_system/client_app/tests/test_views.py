@@ -489,3 +489,11 @@ class ContactPersonDetailViewTestCase(TestCase):
         cont = self.c_person
         self.assertIn('contact_person', resp.context)
         self.assertEqual(resp.context['contact_person'], cont)
+
+
+class ContactPersonUpdateViewTestCase(TestCase):
+    pass
+
+
+class ContactPersonDeleteViewTestCase(TestCase):
+    pass
