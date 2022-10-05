@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %} Редактирование договора {% endblock %}
+
+{% block content %}
+<div class="container text-white">
+    <div class="border-bottom border-info">
+        <h1 class="display-6 text-center">Изменить договор клиента</h1>
+    </div>
+    <div class="container w-50 mt-3">
+        <form method="post">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <div class="container border-top text-center border-info">
+                <input type="submit" class="btn btn-outline-success btn-lg mt-4 w-50" value="Сохранить изменения">
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,99 @@
+{% extends 'base.html' %}
+{% load stuff_tags %}
+
+{% block title %} Договор | {{ contract.title }} {% endblock %}
+
+{% block content %}
+<div class="container text-white w-50">
+    <div class="row mt-3">
+        <div class="col-4 border border-info rounded">
+            <div class="border-bottom border-info mt-3 text-center">
+                <h1 class="fs-3">{{ contract.title }}</h1>
+            </div>
+            <div class="container text-center mt-4 mb-3 d-flex flex-column">
+                <a href="{% url 'cont_update' contract.slug %}" class="btn btn-outline-secondary btn-lg w-100">Редактировать</a>
+                <br>
+                <a href="{% url 'cont_create_file' contract.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить файл</a>
+                <br>
+                <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_contract{{ contract.pk }}">Удалить договор</button>
+
+                <!-- Modal Delete -->
+                    <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_contract{{ contract.pk }}">
+                        <div class="modal-dialog modal-dialog-centered" role="document">
+                            <div class="modal-content rounded-4 shadow bg-info text-dark">
+                                <div class="modal-body p-4 text-center">
+                                    <h5 class="mb-0">Вы действительно хотите удалить договор {{ contract.title }} из системы?</h5>
+                                </div>
+                                <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
+                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'cont_delete' contract.slug %}">Yes</a>
+                                    <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                <!-- Modal Delete -->
+
+            </div>
+        </div>
+        <div class="col border border-info rounded ms-3">
+            <div class="container border-bottom border-info text-center">
+                <h1 class="fs-1">
+                    Основная информация
+                </h1>
+            </div>
+            <div class="text-white container">
+                <p class="fs-2">Сумма: {{ contract.price }} rub.</p>
+                <p class="fs-2">Дата начала: {{ contract.created_at }}</p>
+                {% if contract.date_end %}<p class="fs-2">Дата конца: {{ contract.date_end }}</p>{% endif %}
+                {% if contract.note != '' %}
+                <h1 class="fs-2 border-top border-info">О договоре:</h1>
+                <p class="fs-2">{{ contract.note }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    <div class="row mt-3">
+        <div class="container border-bottom border-info text-center">
+            <h1 class="fs-1">Файлы договора</h1>
+        </div>
+        <div class="container w-50">
+            {% if cont_files %}
+            {% for cont_file in cont_files %}
+            <div class="col mt-3 text-center">
+                <div class="card bg-dark text-white border-info">
+                    <div class="card-title ms-2">
+                        <h1>{{ cont_file.title }}</h1>
+                        <button class="btn btn-close btn-close-white text-right" data-bs-toggle="modal" data-bs-target="#delete_cont_file{{ cont_file.slug }}" style="position: absolute; right: 5px; top: 5px;"></button>
+                    </div>
+                    <div class="card-body">
+                        <p>{{ cont_file.description }}</p>
+                    </div>
+                    <div class="card-footer">
+                        <a href="{{ cont_file.file.url }}" class="btn btn-outline-info text-center w-100">Открыть файл</a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Modal Delete -->
+            <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_cont_file{{ cont_file.slug }}">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content rounded-4 shadow bg-info text-dark">
+                        <div class="modal-body p-4 text-center">
+                            <h5 class="mb-0">Вы действительно хотите удалить файл "{{ cont_file.title }}" договора из системы?</h5>
+                        </div>
+                        <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
+                            <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'delete_cont_file' cont_file.slug %}">Yes</a>
+                            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Delete -->
+            {% endfor %}
+            {% else %}
+            <h1 class="fs-1 text-center mt-3">У данного договора нет файлов</h1>
+            {% endif %}
+        </div>
+    </div>
+</div>
+{% endblock %}

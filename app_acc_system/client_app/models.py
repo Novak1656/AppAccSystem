@@ -1,3 +1,5 @@
+import os
+
 from django.core.validators import FileExtensionValidator
 from django.db import models
 from django.urls import reverse_lazy
@@ -57,6 +59,14 @@ class ClientFiles(models.Model):
             unique_slugify(self, slugify(unidecode(self.title)))
         super(ClientFiles, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        os.remove(self.file.path)
+        super(ClientFiles, self).delete(*args, **kwargs)
+
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)
+
     def __str__(self):
         return f"{self.slug}"
 
@@ -100,6 +110,14 @@ class ContractFiles(models.Model):
             unique_slugify(self, slugify(unidecode(self.title)))
         super(ContractFiles, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        os.remove(self.file.path)
+        super(ContractFiles, self).delete(*args, **kwargs)
+
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)
+
     def __str__(self):
         return f"{self.slug}"
 
@@ -142,6 +160,14 @@ class EquipmentFiles(models.Model):
         if not self.pk:
             unique_slugify(self, slugify(unidecode(self.title)))
         super(EquipmentFiles, self).save(*args, **kwargs)
+
+    def delete(self, *args, **kwargs):
+        os.remove(self.file.path)
+        super(EquipmentFiles, self).delete(*args, **kwargs)
+
+    @property
+    def filename(self):
+        return os.path.basename(self.file.name)
 
     def __str__(self):
         return f"{self.slug}"
@@ -369,6 +395,9 @@ class Contracts(models.Model):
         if not self.pk:
             unique_slugify(self, slugify(unidecode(self.title)))
         super(Contracts, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse_lazy('cont_detail', kwargs={'cont_slug': self.slug})
 
     def __str__(self):
         return f"{self.slug}"

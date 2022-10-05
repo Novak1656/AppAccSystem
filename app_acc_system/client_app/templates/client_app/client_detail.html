@@ -14,7 +14,7 @@
                 {% endif %}
             </div>
             <div class="container text-center mt-4 mb-3 d-flex flex-column border-bottom border-info">
-                <a href="" class="btn btn-outline-info btn-lg w-100 disabled">Договоры <span class="badge bg-danger rounded">{{ client.ct_count }}</span></a>
+                <a href="{% url 'cont_list' client.slug %}" class="btn btn-outline-info btn-lg w-100">Договоры <span class="badge bg-danger rounded">{{ client.ct_count }}</span></a>
                 <br>
                 <a href="" class="btn btn-outline-info btn-lg w-100 disabled">Оборудования <span class="badge bg-danger rounded">{{ client.eq_count }}</span></a>
                 <br>
@@ -28,7 +28,7 @@
                 <br>
                 <a href="{% url 'cp_create' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить контактное лицо</a>
                 <br>
-                <a href="" class="btn btn-outline-secondary btn-lg w-100 disabled">Добавить договор</a>
+                <a href="{% url 'cont_create' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить договор</a>
                 <br>
                 <a href="{% url 'client_create_file' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить файл</a>
                 <br>

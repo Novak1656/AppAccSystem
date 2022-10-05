@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 import requests
-from .models import Clients, ClientFiles, ContactPersons
+from .models import Clients, ClientFiles, ContactPersons, Contracts, ContractFiles
 from phonenumber_field.widgets import PhoneNumberPrefixWidget
 
 
@@ -76,4 +76,26 @@ class ContactPersonsForms(forms.ModelForm):
             'email': forms.EmailInput(attrs={'class': 'form-control'}),
             'phone': PhoneNumberPrefixWidget(initial='RU', attrs={'class': 'form-control'}),
             'note': forms.Textarea(attrs={'class': 'form-control'}),
+        }
+
+
+class ContractsForms(forms.ModelForm):
+    class Meta:
+        model = Contracts
+        fields = ['title', 'price', 'note']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'price': forms.NumberInput(attrs={'class': 'form-control'}),
+            'note': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+
+class ContractsFilesForms(forms.ModelForm):
+    class Meta:
+        model = ContractFiles
+        fields = ['title', 'description', 'file']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'file': forms.FileInput(attrs={'class': 'form-control'})
         }
