@@ -36,4 +36,17 @@ urlpatterns = [
     path('contracts/files/delete/<str:file_slug>/', delete_cont_file, name='delete_cont_file'),
 
 
+    path('settings/equipment_types/', login_required(EquipmentTypeListCreateView.as_view()), name='e_types_list'),
+    path('settings/equipment_types/<int:pk>/delete/', equipment_type_delete, name='e_types_delete'),
+    path('settings/equipment_types/<int:pk>/update/'
+         , login_required(EquipmentTypeUpdateView.as_view()), name='e_types_update'),
+
+    path('settings/equipment_attributes/', login_required(EquipmentAttributeListView.as_view()), name='e_attrs_list'),
+    path('settings/equipment_attributes/create/',
+         login_required(EquipmentAttributeCreateView.as_view()), name='e_attrs_create'),
+    path('settings/equipment_attributes/<int:pk>/delete/', delete_equipment_attributes, name='e_attrs_delete'),
+    path('settings/equipment_attributes/<int:pk>/update/'
+         , login_required(EquipmentTypeUpdateView.as_view()), name='e_attrs_update'),
+
+
 ]

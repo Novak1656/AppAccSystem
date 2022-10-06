@@ -1,4 +1,6 @@
 <!DOCTYPE html>
+{% load client_tags %}
+
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
@@ -26,14 +28,25 @@
             <div class="navbar-collapse collapse" id="navbarsExample06" style="">
                 <ul class="navbar-nav me-auto mb-2 mb-xl-0 justify-content-center mx-auto">
                     <li class="nav-item mx-1">
-                        <a class="nav-link active" aria-current="page" href="">Home</a>
+                        <a class="nav-link text-white" aria-current="page" href="">Home</a>
                     </li>
                     <li class="nav-item mx-1">
-                        <a class="nav-link" href="{% url 'stuff_list' %}">Исполнители</a>
+                        <a class="nav-link text-white" href="{% url 'stuff_list' %}">Исполнители</a>
                     </li>
                     <li class="nav-item mx-1">
-                        <a class="nav-link" href="{% url 'clients_list' %}">Клиенты</a>
+                        <a class="nav-link text-white" href="{% url 'clients_list' %}">Клиенты</a>
                     </li>
+                    {% if user.is_staff %}
+                    <div class="dropdown">
+                        <a class="btn btn-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                            Настройки
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark" aria-labelledby="dropdownMenuLink">
+                            <li><a class="dropdown-item" href="{% url 'e_types_list' %}">Типы оборудования <span class="badge bg-danger">{% get_e_types_count %}</span></a></li>
+                            <li><a class="dropdown-item" href="{% url 'e_attrs_list' %}">Атрибуты оборудования <span class="badge bg-danger">{% get_e_attrs_count %}</span></a></li>
+                        </ul>
+                    </div>
+                    {% endif %}
                 </ul>
 
                 <a class="nav nav-link me-3 py-2 text-white text-decoration-none" href="" data-bs-toggle="modal" data-bs-target="#exit">

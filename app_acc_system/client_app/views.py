@@ -11,7 +11,8 @@ from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
 from django.views.generic import ListView, CreateView, DetailView, UpdateView
 from .models import *
-from .forms import ClientForm, ClientFilesForms, ContactPersonsForms, ContractsForms, ContractsFilesForms
+from .forms import ClientForm, ClientFilesForms, ContactPersonsForms, ContractsForms, ContractsFilesForms, \
+    EquipmentTypeForms, EquipmentAttributeForms
 
 
 # Пересмотреть все запросы во воьюшках tак как слаг это считай пк
@@ -353,6 +354,87 @@ def delete_cont_file(request, file_slug):
     cont_slug = file_obj.contract.slug
     file_obj.delete()
     return redirect('cont_detail', cont_slug=cont_slug)
+
+
+class EquipmentTypeListCreateView(AccessMixin, CreateView):
+    model = EquipmentType
+    template_name = 'client_app/equipment_type_list.html'
+    form_class = EquipmentTypeForms
+    login_url = reverse_lazy('stuff_user_auth')
+    success_url = reverse_lazy('e_types_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404
+        return super(EquipmentTypeListCreateView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(EquipmentTypeListCreateView, self).get_context_data(**kwargs)
+        context['equipment_types'] = self.model.objects.all()
+        return context
+
+
+class EquipmentTypeUpdateView(AccessMixin, UpdateView):
+    model = EquipmentType
+    template_name = 'client_app/equipment_type_update.html'
+    form_class = EquipmentTypeForms
+    login_url = reverse_lazy('stuff_user_auth')
+    success_url = reverse_lazy('e_types_list')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404
+        return super(EquipmentTypeUpdateView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, **kwargs):
+        context = super(EquipmentTypeUpdateView, self).get_context_data(**kwargs)
+        context['form'] = self.form_class(instance=self.object)
+        return context
+
+
+@login_required
+def equipment_type_delete(request, pk):
+    if not request.user.is_staff:
+        raise Http404
+    EquipmentType.objects.get(pk=pk).delete()
+    return redirect('e_types_list')
+
+
+class EquipmentAttributeListView(AccessMixin, ListView):
+    model = EquipmentAttribute
+    template_name = 'client_app/equipment_attributes_list.html'
+    context_object_name = 'equipment_attributes'
+    login_url = reverse_lazy('stuff_user_auth')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404
+        return super(EquipmentAttributeListView, self).dispatch(request, *args, **kwargs)
+
+
+class EquipmentAttributeCreateView(AccessMixin, CreateView):
+    model = EquipmentAttribute
+    template_name = 'client_app/equipment_attributes_create.html'
+    form_class = EquipmentAttributeForms
+    success_url = reverse_lazy('e_attrs_list')
+    login_url = reverse_lazy('stuff_user_auth')
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404
+        return super(EquipmentAttributeCreateView, self).dispatch(request, *args, **kwargs)
+
+
+@login_required
+def delete_equipment_attributes(request, pk):
+    if not request.user.is_staff:
+        raise Http404
+    EquipmentAttribute.objects.get(pk=pk).delete()
+    return redirect('e_attrs_list')
+
+
+class EquipmentAttributeUpdateView(AccessMixin, UpdateView):
+    pass
 
 
 # class EquipmentsListView(AccessMixin, ListView):

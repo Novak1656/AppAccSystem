@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+{% load stuff_tags %}
+
+{% block title %} Атрибуты оборудования {% endblock %}
+
+{% block content %}
+<div class="container text-white border-info">
+    <div class="border-bottom border-info">
+        <h1 class="display-6 mb-3">
+            Атрибуты оборудования
+            | <a href="{% url 'e_attrs_create' %}" class="btn btn-outline-info btn-lg text-end">Добавить атрибут оборудования</a>
+        </h1>
+    </div>
+    <br>
+    <div class="container">
+        <div class="container w-75">
+            {% for attr in equipment_attributes %}
+
+            <nav class="navbar navbar-info bg-dark justify-content-between border border-info rounded mb-3">
+                <a class="navbar-brand text-white ms-3"><h3>{{ attr.code }}: {{ attr.name }}</h3></a>
+                <div class="btn-group me-3">
+                    <a href="" class="btn btn-outline-info  btn-lg w-100">Редактировать</a>
+                    <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_attr{{ attr.pk }}">Удалить</button>
+                </div>
+            </nav>
+            <!-- Modal Delete -->
+            <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_attr{{ attr.pk }}">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content rounded-4 shadow bg-info text-dark">
+                        <div class="modal-body p-4 text-center">
+                            <h5 class="mb-0">Вы действительно хотите удалить атрибут оборудования {{ attr.name }} из системы?</h5>
+                        </div>
+                        <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
+                            <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'e_attrs_delete' attr.pk %}">Yes</a>
+                            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Delete -->
+            {% empty %}
+            <div class="text-center">
+                <h1 class="display-6 mb-3">
+                    Список атрибутов оборудования пуст.
+                </h1>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}

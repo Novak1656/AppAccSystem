@@ -1,7 +1,7 @@
 from django import forms
 from django.core.exceptions import ValidationError
 import requests
-from .models import Clients, ClientFiles, ContactPersons, Contracts, ContractFiles
+from .models import Clients, ClientFiles, ContactPersons, Contracts, ContractFiles, EquipmentType, EquipmentAttribute
 from phonenumber_field.widgets import PhoneNumberPrefixWidget
 
 
@@ -99,3 +99,29 @@ class ContractsFilesForms(forms.ModelForm):
             'description': forms.Textarea(attrs={'class': 'form-control'}),
             'file': forms.FileInput(attrs={'class': 'form-control'})
         }
+
+
+class EquipmentTypeForms(forms.ModelForm):
+    class Meta:
+        model = EquipmentType
+        fields = ['code', 'name']
+        widgets = {
+            'code': forms.NumberInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'})
+        }
+
+
+class EquipmentAttributeForms(forms.ModelForm):
+    class Meta:
+        model = EquipmentAttribute
+        fields = ['code', 'name', 'type_e', 'type_a']
+        widgets = {
+            'code': forms.NumberInput(attrs={'class': 'form-control'}),
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'type_a': forms.Select(choices=EquipmentAttribute.ATTRS_TYPES, attrs={'class': 'form-control'}),
+        }
+
+    type_e = forms.ModelMultipleChoiceField(
+        queryset=EquipmentType.objects.all(),
+        widget=forms.SelectMultiple(attrs={'class': 'form-control'})
+    )
