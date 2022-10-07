@@ -16,7 +16,7 @@
             <div class="container text-center mt-4 mb-3 d-flex flex-column border-bottom border-info">
                 <a href="{% url 'cont_list' client.slug %}" class="btn btn-outline-info btn-lg w-100">Договоры <span class="badge bg-danger rounded">{{ client.ct_count }}</span></a>
                 <br>
-                <a href="" class="btn btn-outline-info btn-lg w-100 disabled">Оборудования <span class="badge bg-danger rounded">{{ client.eq_count }}</span></a>
+                <a href="{% url 'eq_list' client.slug %}" class="btn btn-outline-info btn-lg w-100">Оборудования <span class="badge bg-danger rounded">{{ client.eq_count }}</span></a>
                 <br>
                 <a href="{% url 'cp_list' client.slug %}" class="btn btn-outline-info btn-lg w-100">Контактные лица <span class="badge bg-danger rounded">{{ client.cp_count }}</span></a>
                 <br>
@@ -24,7 +24,7 @@
             <div class="container text-center mt-4 mb-3 d-flex flex-column">
                 <a href="{% url 'client_update' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Редактировать</a>
                 <br>
-                <a href="" class="btn btn-outline-secondary btn-lg w-100 disabled">Добавить оборудование</a>
+                <a href="{% url 'eq_create' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить оборудование</a>
                 <br>
                 <a href="{% url 'cp_create' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить контактное лицо</a>
                 <br>
@@ -32,7 +32,7 @@
                 <br>
                 <a href="{% url 'client_create_file' client.slug %}" class="btn btn-outline-secondary btn-lg w-100">Добавить файл</a>
                 <br>
-                <button class="btn btn-outline-danger btn-lg w-100 disabled" data-bs-toggle="modal" data-bs-target="#delete_user{{ executor.pk }}">Удалить клиента</button>
+                <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_user{{ executor.pk }}">Удалить клиента</button>
 
                 <!-- Modal Delete -->
                     <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_user{{ executor.pk }}">
@@ -42,7 +42,7 @@
                                     <h5 class="mb-0">Вы действительно хотите удалить клиента {{ executor.get_full_name }} из системы?</h5>
                                 </div>
                                 <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
-                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="">Yes</a>
+                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'client_delete_view' client.slug %}">Yes</a>
                                     <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
                                 </div>
                             </div>

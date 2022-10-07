@@ -1,7 +1,8 @@
 from django import forms
 from django.core.exceptions import ValidationError
 import requests
-from .models import Clients, ClientFiles, ContactPersons, Contracts, ContractFiles, EquipmentType, EquipmentAttribute
+from .models import Clients, ClientFiles, ContactPersons, Contracts, ContractFiles, EquipmentType, EquipmentAttribute, \
+    Equipments, EquipmentFiles
 from phonenumber_field.widgets import PhoneNumberPrefixWidget
 
 
@@ -125,3 +126,25 @@ class EquipmentAttributeForms(forms.ModelForm):
         queryset=EquipmentType.objects.all(),
         widget=forms.SelectMultiple(attrs={'class': 'form-control'})
     )
+
+
+class EquipmentsForms(forms.ModelForm):
+    class Meta:
+        model = Equipments
+        fields = ['name', 'type', 'note']
+        widgets = {
+            'name': forms.TextInput(attrs={'class': 'form-control'}),
+            'type': forms.Select(attrs={'class': 'form-control'}),
+            'note': forms.Textarea(attrs={'class': 'form-control'})
+        }
+
+
+class EquipmentFilesForm(forms.ModelForm):
+    class Meta:
+        model = EquipmentFiles
+        fields = ['title', 'description', 'file']
+        widgets = {
+            'title': forms.TextInput(attrs={'class': 'form-control'}),
+            'description': forms.Textarea(attrs={'class': 'form-control'}),
+            'file': forms.FileInput(attrs={'class': 'form-control'})
+        }

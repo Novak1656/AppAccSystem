@@ -11,7 +11,7 @@
             |
             Оборудование клиента {{ client.name }}
             {% if request.user.is_staff %}
-            | <a href="" class="btn btn-outline-info btn-lg text-end">Добавить оборудование</a>
+            | <a href="{% url 'eq_create' client.slug %}" class="btn btn-outline-info btn-lg text-end">Добавить оборудование</a>
             {% endif %}
         </h1>
     </div>
@@ -22,19 +22,20 @@
             <div class="col">
                 <div class="card h-100 bg-dark border border-info rounded">
                     <div class="card-title text-center">
-                        <h3>{{ equipment.get_full_name }}</h3>
+                        <h3>{{ equipment.name }}</h3>
                     </div>
                     <div class="card-body">
                         <ul>
-                            <li>Должность: {{ person.post }}</li>
-                            <li>Email: {{ person.email }}</li>
-                            <li>Телефон: {{ person.phone }}</li>
+                            <li>Тип: {{ equipment.type.name }}</li>
+                            <li>
+                                Дополнительные атрибуты: <ul>{% for attr in equipment.attribute.all %}<li>{{ forloop.counter }}. {{ attr.name }}</li>{% endfor %}</ul>
+                            </li>
                         </ul>
                     </div>
                     {% if request.user.is_staff %}
                     <div class="card-footer">
                         <div class="d-flex align-items-center">
-                            <a href="{{ person.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
+                            <a href="{{ equipment.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
                         </div>
                     </div>
                     {% endif %}
@@ -43,7 +44,7 @@
             {% empty %}
             <div class="text-center">
                 <h1 class="display-6 mb-3">
-                    У клиента {{ client.name }} ещё нет контактных лиц.
+                    Список оборудования клиента {{ client.name }} пуст.
                 </h1>
             </div>
             {% endfor %}

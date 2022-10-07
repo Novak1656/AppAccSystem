@@ -15,11 +15,10 @@
     <div class="container">
         <div class="container w-75">
             {% for attr in equipment_attributes %}
-
             <nav class="navbar navbar-info bg-dark justify-content-between border border-info rounded mb-3">
                 <a class="navbar-brand text-white ms-3"><h3>{{ attr.code }}: {{ attr.name }}</h3></a>
                 <div class="btn-group me-3">
-                    <a href="" class="btn btn-outline-info  btn-lg w-100">Редактировать</a>
+                    <a href="{% url 'e_attrs_update' attr.pk %}" class="btn btn-outline-info  btn-lg w-100">Редактировать</a>
                     <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_attr{{ attr.pk }}">Удалить</button>
                 </div>
             </nav>

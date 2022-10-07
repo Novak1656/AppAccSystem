@@ -7,6 +7,7 @@ urlpatterns = [
     path('clients/add/', login_required(ClientCreateView.as_view()), name='client_create'),
     path('clients/detail/<str:client_slug>/', login_required(ClientDetailView.as_view()), name='client_detail'),
     path('clients/update/<str:client_slug>/', login_required(ClientUpdateView.as_view()), name='client_update'),
+    path('clients/delete/<str:client_slug>/', client_delete_view, name='client_delete_view'),
 
     path('clients/detail/<str:client_slug>/add/file/', login_required(ClientFilesCreateView.as_view()),
          name='client_create_file'),
@@ -46,7 +47,17 @@ urlpatterns = [
          login_required(EquipmentAttributeCreateView.as_view()), name='e_attrs_create'),
     path('settings/equipment_attributes/<int:pk>/delete/', delete_equipment_attributes, name='e_attrs_delete'),
     path('settings/equipment_attributes/<int:pk>/update/'
-         , login_required(EquipmentTypeUpdateView.as_view()), name='e_attrs_update'),
+         , login_required(EquipmentAttributeUpdateView.as_view()), name='e_attrs_update'),
 
 
+    path('clients/detail/<str:client_slug>/equipments/', login_required(EquipmentsListView.as_view()), name='eq_list'),
+    path('clients/detail/<str:client_slug>/equipments/create',
+         login_required(EquipmentsCreateView.as_view()), name='eq_create'),
+    path('equipments/detail/<str:eq_slug>/', login_required(EquipmentsDetailView.as_view()), name='eq_detail'),
+    path('equipments/detail/<str:eq_slug>/update/', login_required(EquipmentsUpdateView.as_view()), name='eq_update'),
+    path('equipments/detail/<str:eq_slug>/delete/', equipments_delete_view, name='eq_delete'),
+
+    path('equipments/detail/<str:eq_slug>/add/file/', login_required(EquipmentFilesCreateView.as_view()),
+         name='eq_create_file'),
+    path('equipments/files/delete/<str:file_slug>/', delete_eq_file, name='delete_eq_file'),
 ]

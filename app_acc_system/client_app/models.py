@@ -17,7 +17,7 @@ def contract_files_directory_path(instance, filename):
 
 
 def equipment_files_directory_path(instance, filename):
-    return f'Equipment_files/{instance.equipment.title}/{filename}'
+    return f'Equipment_files/{instance.equipment.name}/{filename}'
 
 
 class ClientFiles(models.Model):
@@ -327,7 +327,8 @@ class Equipments(models.Model):
     attribute = models.ManyToManyField(
         verbose_name='Атрибуты',
         to=EquipmentAttribute,
-        related_name='equipments'
+        related_name='equipments',
+        blank=True
     )
     note = models.TextField(
         verbose_name='Заметки',
@@ -343,6 +344,9 @@ class Equipments(models.Model):
         if not self.pk:
             unique_slugify(self, slugify(unidecode(self.name)))
         super(Equipments, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse_lazy('eq_detail', kwargs={'eq_slug': self.slug})
 
     def __str__(self):
         return f"{self.slug}"
