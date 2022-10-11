@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %} Заявки {% endblock %}
+
+
+{% block content %}
+<div class="container text-white border-info">
+    <div class="border-bottom border-info">
+        <h1 class="display-6 mb-3">
+            Заявки
+            {% if request.user.is_staff %}
+            | <a class="btn btn-outline-info btn-lg text-end" href="" data-bs-toggle="modal" data-bs-target="#select_client">Добавить заявку</a>
+            {% endif %}
+
+            <!-- Modal Clients -->
+            <div class="modal fade" id="select_client" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-transparent border">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-white" id="exampleModalLabel">Выберите клиента для новой заявки</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{% url 'app_create' %}" method="get" id="select_client_form">
+                                <select name="client" class="form-control" id="id_client">
+                                    <option value="" selected="">---------</option>
+                                    {% for client in clients %}
+                                    <option value="{{ client.pk }}">{{ client.name }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <input form="select_client_form" type="submit" class="btn btn-outline-success text-center btn-lg" value="Продолжить">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Exit -->
+        </h1>
+    </div>
+    <br>
+    <div class="container">
+        <div class="row">
+            {% for application in applications %}
+            <div class="col">
+                <div class="card h-100 bg-dark border border-info rounded">
+                    <div class="card-title text-center">
+                        <h3><span class="badge bg-info">{{ application.pk }}</span> {{ application.subject }}</h3>
+                    </div>
+                    <div class="card-body">
+                        <ul>
+                            <li>Приоритет: {{ application.priority }}</li>
+                            <li>Клиент: <a href="{{ application.client.get_absolute_url }}">{{ application.client.name }}</a></li>
+                            <li>Контакт: <a href="{{ application.contact_person.get_absolute_url }}">{{ application.contact_person.get_full_name }}</a></li>
+                            <li>Ответственный: <a href="{{ application.executor.get_absolute_url }}">{{ application.executor.get_full_name }}</a></li>
+                            <li>Дедлайн: {{ application.deadline }}</li>
+                            <li>Статус: {{ application.status }}</li>
+                        </ul>
+                    </div>
+                    {% if request.user.is_staff %}
+                    <div class="card-footer">
+                        <div class="d-flex align-items-center">
+                            <a href="" class="btn btn-info w-100">Подробнее</a>
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+            {% empty %}
+            <div class="text-center">
+                <h1 class="display-6 mb-3">
+                    Список заявок пуст.
+                </h1>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+</div>
+{% endblock %}
