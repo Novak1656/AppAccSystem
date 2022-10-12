@@ -1,6 +1,7 @@
 import os
 
 from django.db import models
+from django.urls import reverse
 from django_unique_slugify import unique_slugify, slugify
 from unidecode import unidecode
 
@@ -258,6 +259,9 @@ class Applications(models.Model):
         if not self.pk:
             unique_slugify(self, slugify(unidecode(self.subject)))
         super(Applications, self).save(*args, **kwargs)
+
+    def get_absolute_url(self):
+        return reverse('app_detail', kwargs={'app_slug': self.slug})
 
     def __str__(self):
         return f"{self.client}: {self.subject}"
