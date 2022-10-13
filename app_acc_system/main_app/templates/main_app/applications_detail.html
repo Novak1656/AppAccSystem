@@ -54,17 +54,16 @@
                                 </form>
                             </div>
                             <div class="modal-footer justify-content-center">
+                                {% if application.executor %}
+                                <input form="select_executor_form" type="submit" class="btn btn-outline-success text-center btn-lg" value="Переназначить">
+                                {% else %}
                                 <input form="select_executor_form" type="submit" class="btn btn-outline-success text-center btn-lg" value="Назначить">
+                                {% endif %}
                             </div>
                         </div>
                     </div>
                 </div>
                 <!-- Modal Executors -->
-
-                <a href="" class="btn btn-outline-secondary btn-lg w-100">Добавить контактное лицо</a>
-                <br>
-                <a href="" class="btn btn-outline-secondary btn-lg w-100">Добавить договор</a>
-                <br>
                 <a href="" class="btn btn-outline-secondary btn-lg w-100">Добавить файл</a>
                 <br>
                 <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_application{{ application.pk }}">Удалить заявку</button>
@@ -126,43 +125,75 @@
         <div class="container border-bottom border-info text-center">
             <h1 class="fs-1">Комментарии заявки</h1>
         </div>
-        <div class="container w-50">
-            {% if client_files %}
-            {% for client_file in client_files %}
-            <div class="col mt-3 text-center">
-                <div class="card bg-dark text-white border-info">
-                    <div class="card-title ms-2">
-                        <h1>{{ client_file.title }}</h1>
-                        <button class="btn btn-close btn-close-white text-right" data-bs-toggle="modal" data-bs-target="#delete_client_file{{ client_file.pk }}" style="position: absolute; right: 5px; top: 5px;"></button>
-                    </div>
-                    <div class="card-body">
-                        <p>{{ client_file.description }}</p>
-                    </div>
-                    <div class="card-footer">
-                        <a href="{{ client_file.file.url }}" class="btn btn-outline-info text-center w-100">Открыть файл</a>
-                    </div>
-                </div>
+        <div class="container w-75">
+            {% if application.comments %}
+            {% for comment in application.comments.all %}
+            {% if comment.is_private and user.is_staff %}
+            <div class="border border-info rounded mt-3 mb-3">
+                <p class="fs-5 ms-2">{{ comment.comment_body }}</p>
+                {% if comment.file %}
+                <p class="ms-2">
+                    <a href="{{ comment.file.url }}" class="btn btn-outline-info btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
+                            <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                        </svg>
+                        {{ comment.filename }}
+                    </a>
+                </p>
+                {% endif %}
+                <p class="ms-2">{{ comment.created_at }}</p>
             </div>
-
-            <!-- Modal Delete -->
-            <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_client_file{{ client_file.pk }}">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content rounded-4 shadow bg-info text-dark">
-                        <div class="modal-body p-4 text-center">
-                            <h5 class="mb-0">Вы действительно хотите удалить файл "{{ client_file.title }}" клиента из системы?</h5>
-                        </div>
-                        <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
-                            <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'delete_client_file' client_file.slug %}">Yes</a>
-                            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
-                        </div>
-                    </div>
-                </div>
+            {% elif comment.is_public %}
+            <div class="border border-info rounded mt-3 mb-3">
+                <p class="fs-5 ms-2">{{ comment.comment_body }}</p>
+                {% if comment.file %}
+                <p class="ms-2">
+                    <a href="{{ comment.file.url }}" class="btn btn-outline-info btn-sm">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
+                            <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                        </svg>
+                        {{ comment.filename }}
+                    </a>
+                </p>
+                {% endif %}
+                <p class="ms-2">{{ comment.created_at }}</p>
             </div>
-            <!-- Modal Delete -->
+            {% endif %}
             {% endfor %}
             {% else %}
-            <h1 class="fs-1 text-center mt-3">У данной заявки нет комментариев</h1>
+            <h1 class="fs-1 text-center mt-3 mb-3">У данной заявки нет комментариев</h1>
             {% endif %}
+        </div>
+        <div class="container border-top border-info">
+            <form method="post" class="mt-5" enctype="multipart/form-data">
+                {% csrf_token %}
+                <div class="card w-100 bg-dark border border-info rounded text-white">
+                    <div class="card-title">
+                        <h1 class="fs-3 text-center mt-3">Оставить комментарий к заявке</h1>
+                        <p class="text-danger">{{ form.non_field_errors }}</p>
+                    </div>
+                    <div class="card-body">
+                        {{ form.comment_body }}
+                    </div>
+                    <div class="card-footer">
+                        <div class="row text-center">
+                            <div class="col-sm">
+                                {{ form.is_private.label }}
+                                {{ form.is_private }}
+                                <br>
+                                {{ form.is_public.label }}
+                                {{ form.is_public }}
+                            </div>
+                            <div class="col-sm">
+                                {{ form.file }}
+                            </div>
+                            <div class="col-sm">
+                                <input type="submit" class="btn btn-outline-success" value="Отправить">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </form>
         </div>
     </div>
 </div>

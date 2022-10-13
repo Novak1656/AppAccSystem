@@ -11,7 +11,7 @@ def get_application_file_path(instance, filename):
 
 
 def get_comment_file_path(instance, filename):
-    return f'Comment_files/{instance.comment.application.subject}/{filename}'
+    return f'Comment_files/{instance.application.subject}/{filename}'
 
 
 class ApplicationFiles(models.Model):
@@ -61,53 +61,6 @@ class ApplicationFiles(models.Model):
         return f"{self.application}: {self.title}"
 
 
-class CommentsFiles(models.Model):
-    slug = models.SlugField(
-        verbose_name='Слаг',
-        max_length=255
-    )
-    comment = models.ForeignKey(
-        verbose_name='Комментарий',
-        to='ApplicationComments',
-        on_delete=models.CASCADE,
-        related_name='files'
-    )
-    title = models.CharField(
-        verbose_name='Название',
-        max_length=255,
-        help_text='Введите название файла...'
-    )
-    description = models.TextField(
-        verbose_name='Описание',
-        blank=True,
-        help_text='Введите описание файла...'
-    )
-    file = models.FileField(
-        verbose_name='Файл',
-        upload_to=get_comment_file_path
-    )
-
-    class Meta:
-        verbose_name = 'Файл комментария'
-        verbose_name_plural = 'Файлы комментариев'
-        ordering = ['-comment']
-
-    def save(self, *args, **kwargs):
-        if not self.pk:
-            unique_slugify(self, slugify(unidecode(self.title)))
-        super(CommentsFiles, self).save(*args, **kwargs)
-
-    def delete(self, *args, **kwargs):
-        os.remove(self.file.path)
-        super(CommentsFiles, self).delete(*args, **kwargs)
-
-    def filename(self):
-        return os.path.basename(self.file.name)
-
-    def __str__(self):
-        return f"{self.comment}: {self.title}"
-
-
 class ApplicationComments(models.Model):
     application = models.ForeignKey(
         verbose_name='Заявка',
@@ -127,6 +80,11 @@ class ApplicationComments(models.Model):
         verbose_name='Публичный',
         default=True
     )
+    file = models.FileField(
+        verbose_name='Файл',
+        upload_to=get_comment_file_path,
+        blank=True
+    )
     created_at = models.DateTimeField(
         verbose_name='Дата создания',
         auto_now_add=True
@@ -142,8 +100,15 @@ class ApplicationComments(models.Model):
             self.is_private = True
         super(ApplicationComments, self).save(*args, **kwargs)
 
+    def delete(self, *args, **kwargs):
+        os.remove(self.file.path)
+        super(ApplicationComments, self).delete(*args, **kwargs)
+
+    def filename(self):
+        return os.path.basename(self.file.name)
+
     def __str__(self):
-        return f"{self.application}: comment #{self.pk}"
+        return f"comment #{self.pk}"
 
 
 class Applications(models.Model):

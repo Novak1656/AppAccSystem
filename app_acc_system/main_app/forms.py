@@ -1,5 +1,7 @@
 from django import forms
-from .models import Applications
+from django.core.exceptions import ValidationError
+
+from .models import Applications, ApplicationComments
 from client_app.models import Clients
 
 
@@ -30,3 +32,21 @@ class ApplicationsForms(forms.ModelForm):
             ]
             self.fields['contract'].choices = [(item.pk, item.title) for item in client.contracts.all()]
             self.fields['equipment'].queryset = client.equipments.all()
+
+
+class ApplicationCommentsForms(forms.ModelForm):
+    class Meta:
+        model = ApplicationComments
+        fields = ['comment_body', 'is_private', 'is_public', 'file']
+        widgets = {
+            'comment_body': forms.Textarea(
+                attrs={'class': 'form-control', 'placeholder': 'Введите ваш комментарий...'}
+            ),
+            'file': forms.FileInput(attrs={'class': 'form-control'})
+        }
+
+    def clean(self):
+        is_private = self.cleaned_data['is_private']
+        is_public = self.cleaned_data['is_public']
+        if is_private and is_public:
+            raise ValidationError('Выберите только один статус (Публичный или приватный).')

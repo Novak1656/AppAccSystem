@@ -1,11 +1,13 @@
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import AccessMixin
 from django.shortcuts import render, redirect
-from django.urls import reverse_lazy
+from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DetailView
+from django.views.generic.edit import FormMixin
+
 from .models import Applications
 from client_app.models import Clients
-from .forms import ApplicationsForms
+from .forms import ApplicationsForms, ApplicationCommentsForms
 from stuff_app.models import StuffUsers
 
 
@@ -54,21 +56,28 @@ class ApplicationCreateView(AccessMixin, CreateView):
         return context
 
 
-class ApplicationDetailView(AccessMixin, DetailView):
+class ApplicationDetailView(AccessMixin, CreateView):
     model = Applications
     template_name = 'main_app/applications_detail.html'
-    context_object_name = 'application'
     login_url = reverse_lazy('stuff_user_auth')
     slug_url_kwarg = 'app_slug'
+    form_class = ApplicationCommentsForms
 
-    def get_queryset(self):
-        return Applications.objects.select_related(
-            'client', 'contact_person', 'contract'
-        ).prefetch_related('equipment').filter(slug=self.kwargs['app_slug'])
+    def get_success_url(self):
+        return reverse('app_detail', kwargs={'app_slug': self.kwargs['app_slug']})
+    
+    def form_valid(self, form):
+        self.object = form.save(commit=False)
+        self.object.application = self.get_context_data().get('application')
+        self.object.save()
+        return super(ApplicationDetailView, self).form_valid(form)
 
     def get_context_data(self, **kwargs):
         context = super(ApplicationDetailView, self).get_context_data(**kwargs)
         context['executors'] = StuffUsers.objects.filter(role='executor').all()
+        context['application'] = Applications.objects.select_related(
+            'client', 'contact_person', 'contract', 'executor'
+        ).prefetch_related('equipment', 'comments').get(slug=self.kwargs['app_slug'])
         return context
 
 
