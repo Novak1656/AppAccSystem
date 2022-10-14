@@ -8,6 +8,8 @@
     <div class="row mt-3">
         <div class="col-4 border border-info rounded">
             <div class="border-bottom border-info mt-3 text-center">
+                # Добавить возможность отложить заявку
+                # При нажатии на котактное лиццо будет открыываться вспл откно с данными
                 <h1 class="fs-3"><span class="badge bg-info rounded-circle mt-2">#{{ application.pk }}</span> {{ application.subject }}</h1>
             </div>
             <div class="border-bottom border-info mt-3 text-start">
@@ -28,12 +30,15 @@
                 </p>
             </div>
             <div class="container text-center mt-4 mb-3 d-flex flex-column">
-                <a href="" class="btn btn-outline-secondary btn-lg w-100">Редактировать</a>
-                <br>
                 {% if user.is_staff or user.role == 'dispatcher' %}
                 <a class="btn btn-outline-secondary btn-lg w-100" href="" data-bs-toggle="modal" data-bs-target="#select_executor">Назначить/Переназначить исполнителя</a>
                 <br>
                 {% endif %}
+                {% if application.status != 'Closed' %}
+                <a class="btn btn-outline-secondary btn-lg w-100" href="" data-bs-toggle="modal" data-bs-target="#change_status">Сменить статус заявки</a>
+                <br>
+                {% endif %}
+                <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_application{{ application.pk }}">Удалить заявку</button>
 
                 <!-- Modal Executors -->
                 <div class="modal fade" id="select_executor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
@@ -64,9 +69,35 @@
                     </div>
                 </div>
                 <!-- Modal Executors -->
-                <a href="" class="btn btn-outline-secondary btn-lg w-100">Добавить файл</a>
-                <br>
-                <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_application{{ application.pk }}">Удалить заявку</button>
+
+                {% if application.status != 'Closed' %}
+                <!-- Modal Status -->
+                <div class="modal fade" id="change_status" tabindex="-1" aria-labelledby="exampleModalLabel1" aria-hidden="true">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content bg-transparent border">
+                            <div class="modal-header">
+                                <h5 class="modal-title text-white" id="exampleModalLabel1">Установите новый статус для заявки {{ application.subject }}</h5>
+                                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                            </div>
+                            <div class="modal-body">
+                                <form action="{% url 'change_application_status' application.slug %}" method="get" id="change_status_form">
+                                    <select name="status" class="form-control" id="id_status">
+                                        <option value="" selected="">---------</option>
+                                        {% for value, name in status_list %}
+                                        <option value="{{ value }}">{{ name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </form>
+                            </div>
+                            <div class="modal-footer justify-content-center">
+                                <input form="change_status_form" type="submit" class="btn btn-outline-success text-center btn-lg" value="Установить новый статус">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Modal Status -->
+                {% endif %}
+
 
                 <!-- Modal Delete -->
                     <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_application{{ application.pk }}">
@@ -76,7 +107,7 @@
                                     <h5 class="mb-0">Вы действительно хотите удалить заявку {{ application.subject }} клиента {{ application.client.name }} из системы?</h5>
                                 </div>
                                 <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
-                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="">Yes</a>
+                                    <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'app_delete' application.slug %}">Yes</a>
                                     <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
                                 </div>
                             </div>
@@ -89,12 +120,6 @@
             <div class="container border-bottom border-info text-center">
                 <h1 class="fs-1">
                     Основная информация
-                    <a href="" class="btn btn-outline-info disabled">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-download" viewBox="0 0 16 16">
-                            <path d="M.5 9.9a.5.5 0 0 1 .5.5v2.5a1 1 0 0 0 1 1h12a1 1 0 0 0 1-1v-2.5a.5.5 0 0 1 1 0v2.5a2 2 0 0 1-2 2H2a2 2 0 0 1-2-2v-2.5a.5.5 0 0 1 .5-.5z"/>
-                            <path d="M7.646 11.854a.5.5 0 0 0 .708 0l3-3a.5.5 0 0 0-.708-.708L8.5 10.293V1.5a.5.5 0 0 0-1 0v8.793L5.354 8.146a.5.5 0 1 0-.708.708l3 3z"/>
-                        </svg>
-                    </a>
                 </h1>
             </div>
             <div class="text-white container">
@@ -129,42 +154,91 @@
             {% if application.comments %}
             {% for comment in application.comments.all %}
             {% if comment.is_private and user.is_staff %}
-            <div class="border border-info rounded mt-3 mb-3">
-                <p class="fs-5 ms-2">{{ comment.comment_body }}</p>
-                {% if comment.file %}
-                <p class="ms-2">
-                    <a href="{{ comment.file.url }}" class="btn btn-outline-info btn-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
-                            <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
-                        </svg>
-                        {{ comment.filename }}
-                    </a>
-                </p>
-                {% endif %}
-                <p class="ms-2">{{ comment.created_at }}</p>
+            <div class="card bg-dark border-info mt-3">
+                <div class="card-body">
+                    <p class="fs-5 ms-2">{{ comment.comment_body }}</p>
+                    {% if comment.file %}
+                    <p class="ms-2">
+                        <a href="{{ comment.file.url }}" class="btn btn-outline-info btn-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
+                                <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                            </svg>
+                            {{ comment.filename }}
+                        </a>
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group" style="position: absolute; right: 5px; bottom: 10px;">
+                        <button class="btn btn-outline-info text-right" data-bs-toggle="modal" data-bs-target="#update_comment{{ comment.pk }}"><i class="bi bi-pen"></i></button>
+                        <button class="btn btn-outline-danger text-right" data-bs-toggle="modal" data-bs-target="#delete_comment{{ comment.pk }}"><i class="bi bi-trash"></i></button>
+                    </div>
+                    <p class="ms-2">{{ comment.created_at }}</p>
+                </div>
             </div>
             {% elif comment.is_public %}
-            <div class="border border-info rounded mt-3 mb-3">
-                <p class="fs-5 ms-2">{{ comment.comment_body }}</p>
-                {% if comment.file %}
-                <p class="ms-2">
-                    <a href="{{ comment.file.url }}" class="btn btn-outline-info btn-sm">
-                        <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
-                            <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
-                        </svg>
-                        {{ comment.filename }}
-                    </a>
-                </p>
-                {% endif %}
-                <p class="ms-2">{{ comment.created_at }}</p>
+            <div class="card bg-dark border-info mt-3">
+                <div class="card-body">
+                    <p class="fs-5 ms-2">{{ comment.comment_body }}</p>
+                    {% if comment.file %}
+                    <p class="ms-2">
+                        <a href="{{ comment.file.url }}" class="btn btn-outline-info btn-sm">
+                            <svg xmlns="http://www.w3.org/2000/svg" width="35" height="35" fill="currentColor" class="bi bi-paperclip" viewBox="0 0 16 16">
+                                <path d="M4.5 3a2.5 2.5 0 0 1 5 0v9a1.5 1.5 0 0 1-3 0V5a.5.5 0 0 1 1 0v7a.5.5 0 0 0 1 0V3a1.5 1.5 0 1 0-3 0v9a2.5 2.5 0 0 0 5 0V5a.5.5 0 0 1 1 0v7a3.5 3.5 0 1 1-7 0V3z"/>
+                            </svg>
+                            {{ comment.filename }}
+                        </a>
+                    </p>
+                    {% endif %}
+                </div>
+                <div class="card-footer">
+                    <div class="btn-group" style="position: absolute; right: 5px; bottom: 10px;">
+                        <button class="btn btn-outline-info text-right" data-bs-toggle="modal" data-bs-target="#update_comment{{ comment.pk }}"><i class="bi bi-pen"></i></button>
+                        <button class="btn btn-outline-danger text-right" data-bs-toggle="modal" data-bs-target="#delete_comment{{ comment.pk }}"><i class="bi bi-trash"></i></button>
+                    </div>
+                    <p class="ms-2">{{ comment.created_at }}</p>
+                </div>
             </div>
             {% endif %}
+            <!-- Modal Delete -->
+            <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_comment{{ comment.pk }}">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content rounded-4 shadow bg-info text-dark">
+                        <div class="modal-body p-4 text-center">
+                            <h5 class="mb-0">Вы действительно хотите удалить комментарий к задаче клиента из системы?</h5>
+                        </div>
+                        <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
+                            <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'delete_comment' comment.pk %}">Yes</a>
+                            <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Delete -->
+
+            <!-- Modal Update -->
+            <div class="modal modal-alert" tabindex="-1" role="dialog" id="update_comment{{ comment.pk }}">
+                <div class="modal-dialog modal-dialog-centered" role="document">
+                    <div class="modal-content rounded-4 shadow bg-info text-dark">
+                        <div class="modal-body p-4 text-center">
+                            <form action="{% url 'update_comment' comment.pk %}" method="post" id="update_comment_form{{ comment.pk }}">
+                                {% csrf_token %}
+                                <textarea name="comment_body{{ comment.pk }}" cols="40" rows="10" class="form-control" placeholder="Введите ваш комментарий..." maxlength="2000" required="" id="id_comment_body{{ comment.pk }}">{{ comment.comment_body }}</textarea>
+                            </form>
+                        </div>
+                        <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark text-center">
+                            <input form="update_comment_form{{ comment.pk }}" type="submit" class="btn btn-success text-center btn-lg w-100" value="Сохранить изменения">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Update -->
             {% endfor %}
             {% else %}
             <h1 class="fs-1 text-center mt-3 mb-3">У данной заявки нет комментариев</h1>
             {% endif %}
         </div>
-        <div class="container border-top border-info">
+        <div class="container border-top border-info mt-3">
             <form method="post" class="mt-5" enctype="multipart/form-data">
                 {% csrf_token %}
                 <div class="card w-100 bg-dark border border-info rounded text-white">

@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import (Applications, ApplicationComments, ApplicationFiles)
+from .models import (Applications, ApplicationComments, Reports)
 
 
 @admin.register(Applications)
@@ -21,10 +21,10 @@ class ApplicationCommentsAdmin(admin.ModelAdmin):
     save_as = True
 
 
-@admin.register(ApplicationFiles)
-class ApplicationFilesAdmin(admin.ModelAdmin):
-    list_display_links = ['pk', 'slug']
+@admin.register(Reports)
+class ReportsAdmin(admin.ModelAdmin):
+    list_display_links = ['pk', 'title']
     search_fields = ['title']
-    list_display = ['pk', 'slug', 'application', 'title', 'file']
-    list_filter = ['application', 'title']
+    list_display = ['pk', 'title', 'type', 'client', 'file', 'created_at']
+    list_filter = ['created_at', 'type', 'client']
     save_as = True

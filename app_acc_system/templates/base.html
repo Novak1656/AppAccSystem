@@ -37,6 +37,9 @@
                         <a class="nav-link text-white" href="{% url 'clients_list' %}">Клиенты</a>
                     </li>
                     {% if user.is_staff %}
+                    <li class="nav-item mx-1">
+                        <a class="nav-link text-white" aria-current="page" href="{% url 'reports_list' %}">Отчёты</a>
+                    </li>
                     <div class="dropdown">
                         <a class="btn btn-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
                             Настройки

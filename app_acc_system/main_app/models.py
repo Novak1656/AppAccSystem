@@ -6,59 +6,81 @@ from django_unique_slugify import unique_slugify, slugify
 from unidecode import unidecode
 
 
-def get_application_file_path(instance, filename):
-    return f'Application_files/{instance.client.name}/{instance.subject}/{filename}'
-
-
 def get_comment_file_path(instance, filename):
     return f'Comment_files/{instance.application.subject}/{filename}'
 
+# Удалить это после завершения проекта
+def get_application_file_path(instance, filename):
+    return f'Comment_files/{instance.application.subject}/{filename}'
 
-class ApplicationFiles(models.Model):
-    slug = models.SlugField(
-        verbose_name='Слаг',
-        max_length=255
-    )
-    application = models.ForeignKey(
-        verbose_name='Заявка',
-        to='Applications',
-        on_delete=models.CASCADE,
-        related_name='files',
-    )
+
+def get_report_file_path(instance, filename):
+    if instance.type == 'Client report':
+        return f'Reports/Client reports/{instance.client.name}/{filename}'
+    elif instance.type == 'Clients report':
+        return f'Reports/Clients reports/{filename}'
+    else:
+        return f'Reports/Executors reports/{filename}'
+
+
+class Reports(models.Model):
+    TYPE_LIST = [
+        ('Client report', 'Отчет о выполненных заявках по клиенту'),
+        ('Clients report', 'Отчет о заявках клиентов'),
+        ('Executors report', 'Отчет о выполненных заявках исполнителей')
+    ]
+
     title = models.CharField(
         verbose_name='Название',
         max_length=255,
-        help_text='Введите название файла...'
+        blank=True
     )
-    description = models.TextField(
-        verbose_name='Описание',
+    type = models.CharField(
+        verbose_name='Тип',
+        max_length=255,
+        choices=TYPE_LIST
+    )
+    client = models.ForeignKey(
+        verbose_name='Клиент',
+        to='client_app.Clients',
+        on_delete=models.CASCADE,
+        related_name='reports',
         blank=True,
-        help_text='Введите описание файла...'
+        null=True,
+        help_text='Выберите клиента по которому хотите составить отчёт...'
     )
     file = models.FileField(
         verbose_name='Файл',
-        upload_to=get_application_file_path,
+        upload_to=get_report_file_path
+    )
+    created_at = models.DateTimeField(
+        verbose_name='Дата создания',
+        auto_now_add=True
     )
 
     class Meta:
-        verbose_name = 'Файл заявки'
-        verbose_name_plural = 'Файлы заявок'
-        ordering = ['-application']
+        verbose_name = 'Отчёт'
+        verbose_name_plural = 'Отчёты'
+        ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
-        if not self.pk:
-            unique_slugify(self, slugify(unidecode(self.title)))
-        super(ApplicationFiles, self).save(*args, **kwargs)
+        if self.type == 'Client report':
+            self.title = f'Отчет о выполненных заявках по клиенту {self.client.name} от {self.created_at}'
+        elif self.type == 'Clients report':
+            self.title = f'Отчет о заявках клиентов от {self.created_at}'
+        else:
+            self.title = f'Отчет о выполненных заявках исполнителей от {self.created_at}'
+        super(Reports, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
         os.remove(self.file.path)
-        super(ApplicationFiles, self).delete(*args, **kwargs)
+        super(Reports, self).delete(*args, **kwargs)
 
     def filename(self):
         return os.path.basename(self.file.name)
 
     def __str__(self):
-        return f"{self.application}: {self.title}"
+        return f'{self.title}'
 
 
 class ApplicationComments(models.Model):
@@ -101,7 +123,8 @@ class ApplicationComments(models.Model):
         super(ApplicationComments, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):
-        os.remove(self.file.path)
+        if self.file:
+            os.remove(self.file.path)
         super(ApplicationComments, self).delete(*args, **kwargs)
 
     def filename(self):

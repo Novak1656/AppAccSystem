@@ -1,11 +1,17 @@
+import os
+import shutil
+
+from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import AccessMixin
+from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
 from django.views.generic import ListView, CreateView, DetailView
 from django.views.generic.edit import FormMixin
 
-from .models import Applications
+from .models import Applications, ApplicationComments, Reports
 from client_app.models import Clients
 from .forms import ApplicationsForms, ApplicationCommentsForms
 from stuff_app.models import StuffUsers
@@ -78,6 +84,13 @@ class ApplicationDetailView(AccessMixin, CreateView):
         context['application'] = Applications.objects.select_related(
             'client', 'contact_person', 'contract', 'executor'
         ).prefetch_related('equipment', 'comments').get(slug=self.kwargs['app_slug'])
+        status_list = {
+            'New': [('At work', 'В работе'), ('Postponed', 'Отложена')],
+            'At work': [('Postponed', 'Отложена'), ('Solved', 'Решена')],
+            'Postponed': [('At work', 'В работе'), ('Solved', 'Решена')],
+            'Solved': [('At work', 'В работе'), ('Postponed', 'Отложена'), ('Closed', 'Закрыта')],
+        }
+        context['status_list'] = status_list.get(context['application'].status)
         return context
 
 
@@ -88,3 +101,55 @@ def set_application_executor(request, app_slug):
     application.executor = executor
     application.save()
     return redirect('app_detail', app_slug=app_slug)
+
+
+@login_required
+def update_comment_body(request, comment_pk):
+    ApplicationComments.objects.filter(pk=comment_pk).update(comment_body=request.POST[f'comment_body{comment_pk}'])
+    return redirect(request.META['HTTP_REFERER'])
+
+
+@login_required
+def delete_comment(request, comment_pk):
+    ApplicationComments.objects.get(pk=comment_pk).delete()
+    return redirect(request.META['HTTP_REFERER'])
+
+
+@login_required
+def delete_application(request, app_slug):
+    application = Applications.objects.prefetch_related('comments').get(slug=app_slug)
+    if application.comments.all().filter(~Q(file=None)).exists():
+        files_path = os.path.join(settings.BASE_DIR, f"media/Comment_files/{application.subject}/")
+        shutil.rmtree(files_path)
+    application.delete()
+    return redirect('app_list')
+
+
+@login_required
+def change_application_status(request, app_slug):
+    Applications.objects.filter(slug=app_slug).update(status=request.GET.get('status'))
+    return redirect('app_detail', app_slug=app_slug)
+
+
+class ReportsListView(AccessMixin, ListView):
+    model = Reports
+    template_name = 'main_app/reports_list.html'
+    context_object_name = 'reports'
+    login_url = reverse_lazy('stuff_user_auth')
+
+    def get_queryset(self):
+        report_type = self.request.GET.get('report_type', None)
+        if report_type:
+            if report_type == 'clients':
+                return Reports.objects.filter(type='Clients report').all()
+            elif report_type == 'executors':
+                return Reports.objects.filter(type='Executors report').all()
+            else:
+                client_pk = self.request.GET.get('client_pk')
+                return Reports.objects.filter(client__pk=client_pk).all()
+        return Reports.objects.all()
+
+    def dispatch(self, request, *args, **kwargs):
+        if not request.user.is_staff:
+            raise Http404
+        return super(ReportsListView, self).dispatch(request, *args, **kwargs)

@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load main_app_tags %}
+
+{% block title %} Отчёты {% endblock %}
+
+
+{% block content %}
+<div class="container text-white border-info">
+    <div class="">
+        <div class="container mt-3 mb-3">
+            <ul class="nav nav-tabs">
+                <li class="nav-item">
+                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}">Все отчёты<span class="badge bg-danger rounded">{{ reports.count }}</span></a>
+                </li>
+                <li class="nav-item">
+                    <div class="dropdown">
+                        <a class="nav-link text-dark bg-info border-dark border-bottom-0" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
+                            Отчет о выполненных заявках по клиенту
+                        </a>
+                        <ul class="dropdown-menu dropdown-menu-dark w-100" aria-labelledby="dropdownMenuLink">
+                            <li><a class="dropdown-item" href="">Сгенерировать отчёт</a></li>
+                            {% for client in reports.clients.all %}
+                            <li><a class="dropdown-item" href="{% url 'reports_list' %}?report_type='client'&client_pk={{ client.pk }}">client.name</a></li>
+                            {% endfor %}
+                        </ul>
+                    </div>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}?report_type='clients'">Отчет о заявках клиентов <span class="badge bg-danger rounded">0</span></a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}?report_type='executors'">Отчет о выполненных заявках исполнителей <span class="badge bg-danger rounded">0</span></a>
+                </li>
+            </ul>
+        </div>
+        <br>
+        <div class="container">
+            <div class="row">
+                {% if reports %}
+                <table class="table-info text-white">
+                    <thead>
+                    <tr>
+                        <th scope="col">#</th>
+                        <th scope="col">Название</th>
+                        <th scope="col">Файл</th>
+                        <th scope="col">Удалить</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    {% for report in reports %}
+                    <tr>
+                        <th scope="row">{{ forloop.counter }}</th>
+                        <td>{{ report.title }}</td>
+                        <td>{{ report.file }}</td>
+                        <td></td>
+                    </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                {% else %}
+                <div class="text-center">
+                    <h1 class="display-6 mb-3">
+                        Список отчётов пуст.
+                    </h1>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
