@@ -2,6 +2,8 @@ import os
 
 from django.db import models
 from django.urls import reverse
+from django.utils import dateformat
+from django.utils.timezone import now
 from django_unique_slugify import unique_slugify, slugify
 from unidecode import unidecode
 
@@ -64,12 +66,13 @@ class Reports(models.Model):
         ordering = ['-created_at']
 
     def save(self, *args, **kwargs):
+        cur_date = dateformat.format(now(), "d.b.Y H:i:s")
         if self.type == 'Client report':
-            self.title = f'Отчет о выполненных заявках по клиенту {self.client.name} от {self.created_at}'
+            self.title = f'Отчет о выполненных заявках по клиенту {self.client.name} от {cur_date}'
         elif self.type == 'Clients report':
-            self.title = f'Отчет о заявках клиентов от {self.created_at}'
+            self.title = f'Отчет о заявках клиентов от {cur_date}'
         else:
-            self.title = f'Отчет о выполненных заявках исполнителей от {self.created_at}'
+            self.title = f'Отчет о выполненных заявках исполнителей от {cur_date}'
         super(Reports, self).save(*args, **kwargs)
 
     def delete(self, *args, **kwargs):

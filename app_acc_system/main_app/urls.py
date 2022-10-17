@@ -10,6 +10,8 @@ urlpatterns = [
 
     path('reports/', login_required(ReportsListView.as_view()), name='reports_list'),
 
+    path('reports/generate_client_report/', report_client_create_view, name='generate_client_report'),
+
     path('application/set_executor/<str:app_slug>/', set_application_executor, name='set_application_executor'),
     path('application/delete_comment/<int:comment_pk>/', delete_comment, name='delete_comment'),
     path('application/update_comment/<int:comment_pk>/', update_comment_body, name='update_comment'),

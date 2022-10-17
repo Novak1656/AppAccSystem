@@ -1,13 +1,17 @@
+import io
 import os
 import shutil
-
+import xlsxwriter
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import AccessMixin
-from django.db.models import Q
+from django.core.files import File
+from django.db.models import Q, Count, Case, When, Sum, F, IntegerField
 from django.http import Http404
 from django.shortcuts import render, redirect
 from django.urls import reverse_lazy, reverse
+from django.utils import dateformat
+from django.utils.timezone import now
 from django.views.generic import ListView, CreateView, DetailView
 from django.views.generic.edit import FormMixin
 
@@ -127,7 +131,11 @@ def delete_application(request, app_slug):
 
 @login_required
 def change_application_status(request, app_slug):
-    Applications.objects.filter(slug=app_slug).update(status=request.GET.get('status'))
+    status = request.GET.get('status')
+    if status == 'Closed':
+        Applications.objects.filter(slug=app_slug).update(status=status, closing_date=now())
+    else:
+        Applications.objects.filter(slug=app_slug).update(status=status)
     return redirect('app_detail', app_slug=app_slug)
 
 
@@ -153,3 +161,60 @@ class ReportsListView(AccessMixin, ListView):
         if not request.user.is_staff:
             raise Http404
         return super(ReportsListView, self).dispatch(request, *args, **kwargs)
+
+    def get_context_data(self, *, object_list=None, **kwargs):
+        context = super(ReportsListView, self).get_context_data(**kwargs)
+        context['clients'] = Clients.objects.prefetch_related('reports').all()
+        report_type = self.request.GET.get('report_type', None)
+        if report_type:
+            context['cur_report_type'] = report_type
+        client_pk = self.request.GET.get('client_pk')
+        if client_pk:
+            context['cur_client'] = context['clients'].get(pk=client_pk)
+        context['clients_with_reports'] = [(client.pk, client.name, client.reports.count()) for client in context.get('clients') if client.reports.all().exists()]
+        return context
+
+
+@login_required
+def report_client_create_view(request):
+    client = Clients.objects.get(pk=request.GET.get('client'))
+    detail = request.GET.get('detail')
+    client_applications = Applications.objects.filter(Q(client=client) & Q(status='Closed'))
+
+    output = io.BytesIO()
+
+    workbook = xlsxwriter.Workbook(output, {'in_memory': True})
+    worksheet = workbook.add_worksheet()
+
+    if not detail:
+        not_detail_report_data = client_applications.\
+            annotate(
+                plane=Count(Case(When(type='Planned', then=1), output_field=IntegerField())),
+                unplane=Count(Case(When(type='Unplanned', then=1), output_field=IntegerField())))\
+            .aggregate(
+                plane_cnt=Sum('plane'),
+                unplane_cnt=Sum('unplane'),
+                sum=Sum('plane')+Sum('unplane')
+            )
+
+        exel_data = list(zip(['Плановая', 'Внеплановая', 'Все заявки:'], not_detail_report_data))
+
+        worksheet.write('A1', 'Тип заявки')
+        worksheet.write('B1', 'Количество')
+
+        for row, (row_name, value) in enumerate(exel_data, start=1):
+            worksheet.write(row, 0, row_name)
+            worksheet.write(row, 1, not_detail_report_data.get(value, 0))
+    else:
+        pass
+
+    workbook.close()
+    output.seek(0)
+
+    Reports.objects.create(
+        type='Client report',
+        client=client,
+        file=File(output, name=f'report_{client.name.lower()}_{dateformat.format(now(), "dbY_H_i_s")}.xlsx')
+    )
+    output.close()
+    return redirect(f"{reverse('reports_list')}?report_type=client&client_pk={client.pk}")

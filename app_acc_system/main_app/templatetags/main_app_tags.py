@@ -26,3 +26,13 @@ def type_application_translate(type_value: str) -> str:
     for key, value in type_list:
         if key == type_value:
             return value
+
+
+@register.filter(name='get_report_page_title')
+def get_report_page_title(report_type):
+    reports_title = {
+        'clients': 'Отчёты по всем клиентам',
+        'executors': 'Отчёты по всем исполнителям',
+        'client': 'Отчёты по клиенту'
+    }
+    return reports_title.get(report_type)
