@@ -1,0 +1,28 @@
+<!-- Modal Client Report Generate -->
+<div class="modal fade" id="generate_client_report" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-info text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Выберите клиента по которому хотите сгенерировать отчёт</h5>
+                <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'generate_client_report' %}" method="get" id="generate_client_report_form">
+                    <select name="client" class="form-control" id="id_client">
+                        <option value="" selected="">---------</option>
+                        {% for client in clients %}
+                        <option value="{{ client.pk }}">{{ client.name }}</option>
+                        {% endfor %}
+                    </select>
+                    <br>
+                    Подробный отчёт
+                    <input type="checkbox" name="detail" id="id_detail">
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <input form="generate_client_report_form" type="submit" class="btn btn-outline-success text-center btn-lg" value="Сгенерировать отчёт">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Client Report Generate -->

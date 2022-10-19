@@ -10,57 +10,27 @@
         <div class="container mt-3 mb-3">
             <ul class="nav nav-tabs">
                 <li class="nav-item">
-                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}">Все отчёты<span class="badge bg-danger rounded">{{ reports.count }}</span></a>
+                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}">Все отчёты <span class="badge bg-danger rounded">{{ all_reports_cnt }}</span></a>
                 </li>
                 <li class="nav-item">
                     <div class="dropdown">
                         <a class="nav-link text-dark bg-info border-dark border-bottom-0" href="#" role="button" id="dropdownMenuLink" data-bs-toggle="dropdown" aria-expanded="false">
-                            Отчет о выполненных заявках по клиенту
+                            Отчет о выполненных заявках по клиенту <span class="badge bg-danger rounded">{{ client_rep_cnt }}</span>
                         </a>
                         <ul class="dropdown-menu dropdown-menu-dark w-100" aria-labelledby="dropdownMenuLink">
-                            {% if not clients_with_reports %}
                             <li><a class="dropdown-item" href="" data-bs-toggle="modal" data-bs-target="#generate_client_report">Сгенерировать отчёт</a></li>
-                            {% endif %}
                             {% for pk, name, rep_cnt in clients_with_reports %}
                             <li><a class="dropdown-item" href="{% url 'reports_list' %}?report_type=client&client_pk={{ pk }}">{{name}} <span class="badge bg-danger rounded">{{rep_cnt}}</span></a></li>
                             {% endfor %}
                         </ul>
-
-                        <!-- Modal Client Report Generate -->
-                        <div class="modal fade" id="generate_client_report" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered">
-                                <div class="modal-content bg-transparent border">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title text-white" id="exampleModalLabel">Выберите клиента по которому хотите сгенерировать отчёт</h5>
-                                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form action="{% url 'generate_client_report' %}" method="get" id="generate_client_report_form">
-                                            <select name="client" class="form-control" id="id_client">
-                                                <option value="" selected="">---------</option>
-                                                {% for client in clients %}
-                                                <option value="{{ client.pk }}">{{ client.name }}</option>
-                                                {% endfor %}
-                                            </select>
-                                            <br>
-                                            Подробный отчёт
-                                            <input type="checkbox" name="detail" id="id_detail">
-                                        </form>
-                                    </div>
-                                    <div class="modal-footer justify-content-center">
-                                        <input form="generate_client_report_form" type="submit" class="btn btn-outline-success text-center btn-lg" value="Сгенерировать отчёт">
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                        <!-- Modal Client Report Generate -->
+                        {% include 'inc/_client_generate_report_modal.html' %}
                     </div>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}?report_type=clients">Отчет о заявках клиентов <span class="badge bg-danger rounded">0</span></a>
+                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}?report_type=clients">Отчет о заявках клиентов <span class="badge bg-danger rounded">{{ clients_rep_cnt }}</span></a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}?report_type=executors">Отчет о выполненных заявках исполнителей <span class="badge bg-danger rounded">0</span></a>
+                    <a class="nav-link text-dark bg-info border-dark border-bottom-0" aria-current="page" href="{% url 'reports_list' %}?report_type=executors">Отчет о выполненных заявках исполнителей <span class="badge bg-danger rounded">{{ executors_rep_cnt }}</span></a>
                 </li>
             </ul>
         </div>
@@ -76,14 +46,16 @@
                                     Сгенерировать отчёт
                                 </a>
                                 <ul class="dropdown-menu dropdown-menu-dark w-100 text-center" aria-labelledby="dropdownMenuLink1">
-                                    <li><a class="dropdown-item" href="{% url 'generate_client_report' %}?client={{ cur_client.pk }}&detail=on" data-bs-toggle="modal" data-bs-target="#generate_client_report">Обычный отчёт</a></li>
-                                    <li><a class="dropdown-item" href="{% url 'generate_client_report' %}?client={{ cur_client.pk }}">Подробный отчёт</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'generate_client_report' %}?client={{ cur_client.pk }}">Обычный отчёт</a></li>
+                                    <li><a class="dropdown-item" href="{% url 'generate_client_report' %}?client={{ cur_client.pk }}&detail=on">Подробный отчёт</a></li>
                                 </ul>
                             </div>
                         {% elif cur_report_type == 'clients' %}
-                            | <a href="" class="btn btn-outline-info btn-lg text-end">Сгенерировать отчёт</a>
+                            | <a href="" class="btn btn-outline-info btn-lg text-end" data-bs-toggle="modal" data-bs-target="#generate_clients_report">Сгенерировать отчёт</a>
+                            {% include 'inc/_clients_generate_report_modal.html' %}
                         {% else %}
-                            | <a href="" class="btn btn-outline-info btn-lg text-end">Сгенерировать отчёт</a>
+                            | <a href="" class="btn btn-outline-info btn-lg text-end" data-bs-toggle="modal" data-bs-target="#generate_executors_report">Сгенерировать отчёт</a>
+                            {% include 'inc/_executors_generate_report_modal.html' %}
                         {% endif %}
                     {% else %}
                     Все отчёты
@@ -108,7 +80,7 @@
                         <th scope="row"><h3 class="fs-5 text-center">{{ forloop.counter }}.</h3></th>
                         <td><h3 class="fs-5 ms-3">{{ report.title }}</h3></td>
                         <td class="text-center">
-                            <a href="{{ report.file.url }}" class="btn btn-outline-info w-100 text-center border-top-0 border-start-0 border-end-0">
+                            <a href="{{ report.file.url }}" target="_blank" class="btn btn-outline-info w-100 text-center border-top-0 border-start-0 border-end-0">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-filetype-xlsx" viewBox="0 0 16 16">
                                     <path fill-rule="evenodd" d="M14 4.5V11h-1V4.5h-2A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v9H2V2a2 2 0 0 1 2-2h5.5L14 4.5ZM7.86 14.841a1.13 1.13 0 0 0 .401.823c.13.108.29.192.479.252.19.061.411.091.665.091.338 0 .624-.053.858-.158.237-.105.416-.252.54-.44a1.17 1.17 0 0 0 .187-.656c0-.224-.045-.41-.135-.56a1.002 1.002 0 0 0-.375-.357 2.028 2.028 0 0 0-.565-.21l-.621-.144a.97.97 0 0 1-.405-.176.37.37 0 0 1-.143-.299c0-.156.061-.284.184-.384.125-.101.296-.152.513-.152.143 0 .266.023.37.068a.624.624 0 0 1 .245.181.56.56 0 0 1 .12.258h.75a1.093 1.093 0 0 0-.199-.566 1.21 1.21 0 0 0-.5-.41 1.813 1.813 0 0 0-.78-.152c-.293 0-.552.05-.777.15-.224.099-.4.24-.527.421-.127.182-.19.395-.19.639 0 .201.04.376.123.524.082.149.199.27.351.367.153.095.332.167.54.213l.618.144c.207.049.36.113.462.193a.387.387 0 0 1 .153.326.512.512 0 0 1-.085.29.558.558 0 0 1-.255.193c-.111.047-.25.07-.413.07-.117 0-.224-.013-.32-.04a.837.837 0 0 1-.249-.115.578.578 0 0 1-.255-.384h-.764Zm-3.726-2.909h.893l-1.274 2.007 1.254 1.992h-.908l-.85-1.415h-.035l-.853 1.415H1.5l1.24-2.016-1.228-1.983h.931l.832 1.438h.036l.823-1.438Zm1.923 3.325h1.697v.674H5.266v-3.999h.791v3.325Zm7.636-3.325h.893l-1.274 2.007 1.254 1.992h-.908l-.85-1.415h-.035l-.853 1.415h-.861l1.24-2.016-1.228-1.983h.931l.832 1.438h.036l.823-1.438Z"/>
                                 </svg>
@@ -121,6 +93,21 @@
                                 </svg>
                             </button>
                         </td>
+                        <!-- Report Delete -->
+                        <div class="modal modal-alert" tabindex="-1" role="dialog" id="delete_report{{ report.pk }}">
+                            <div class="modal-dialog modal-dialog-centered" role="document">
+                                <div class="modal-content rounded-4 shadow bg-info text-dark">
+                                    <div class="modal-body p-4 text-center">
+                                        <h5 class="mb-0">Вы действительно хотите удалить {{ report.title }} из системы?</h5>
+                                    </div>
+                                    <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
+                                        <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'delete_report' %}?rep_pk={{ report.pk }}">Yes</a>
+                                        <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <!-- Modal Delete -->
                     </tr>
                     {% endfor %}
                     </tbody>

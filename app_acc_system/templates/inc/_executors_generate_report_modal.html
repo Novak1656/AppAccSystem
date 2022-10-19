@@ -1,0 +1,27 @@
+<!-- Modal Client Report Generate -->
+<div class="modal fade" id="generate_executors_report" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content bg-info text-dark">
+            <div class="modal-header">
+                <h5 class="modal-title" id="exampleModalLabel">Выберите период по которому хотите сгенерировать отчёт</h5>
+                <button type="button" class="btn-close btn-close-dark" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form action="{% url 'generate_executors_report' %}" method="get" id="generate_executors_report_form">
+                    <div class="row">
+                        <div class="col">
+                            <span>С: <input type="date" class="form-control" name="date1" id="id_date1" required="true"></span>
+                        </div>
+                        <div class="col">
+                            <span>По: <input type="date" class="form-control" name="date2" id="id_date2" required="true" value="{{ cur_date }}"></span>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer justify-content-center">
+                <input form="generate_executors_report_form" type="submit" class="btn btn-outline-success text-center btn-lg" value="Сгенерировать отчёт">
+            </div>
+        </div>
+    </div>
+</div>
+<!-- Modal Client Report Generate -->
