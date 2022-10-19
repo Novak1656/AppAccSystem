@@ -19,6 +19,12 @@ from .forms import ApplicationsForms, ApplicationCommentsForms
 from stuff_app.models import StuffUsers
 
 
+def chek_is_staff(user) -> None:
+    if not user.is_staff:
+        raise Http404
+    return
+
+
 class ApplicationsListView(AccessMixin, ListView):
     model = Applications
     template_name = 'main_app/applications_list.html'
@@ -156,8 +162,7 @@ class ReportsListView(AccessMixin, ListView):
         return Reports.objects.all()
 
     def dispatch(self, request, *args, **kwargs):
-        if not request.user.is_staff:
-            raise Http404
+        chek_is_staff(request.user)
         return super(ReportsListView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -196,6 +201,7 @@ class ReportsListView(AccessMixin, ListView):
 
 @login_required
 def report_client_create_view(request):
+    chek_is_staff(request.user)
     client = Clients.objects.get(pk=request.GET.get('client'))
     detail = request.GET.get('detail')
     client_applications = Applications.objects.filter(Q(client=client) & Q(status='Closed'))
@@ -287,6 +293,7 @@ def report_client_create_view(request):
 
 @login_required
 def report_clients_create_view(request):
+    chek_is_staff(request.user)
     date1, date2 = request.GET.get('date1'), request.GET.get('date2')
     apps = Applications.objects.select_related('client').filter(created_at__date__range=(date1, date2))\
         .values(name=F('client__name'))\
@@ -328,6 +335,7 @@ def report_clients_create_view(request):
 
 @login_required
 def report_executors_create_view(request):
+    chek_is_staff(request.user)
     date1, date2 = request.GET.get('date1'), request.GET.get('date2')
     executors_res = Applications.objects.select_related('executor')\
         .filter(Q(closing_date__date__range=(date1, date2)) & ~Q(executor=None))\
@@ -377,6 +385,7 @@ def report_executors_create_view(request):
 
 @login_required
 def delete_report_view(request):
+    chek_is_staff(request.user)
     rep_pk = request.GET.get('rep_pk')
     Reports.objects.get(pk=rep_pk).delete()
     return redirect(request.META['HTTP_REFERER'])
