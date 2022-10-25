@@ -19,4 +19,9 @@ urlpatterns = [
     path('application/delete_comment/<int:comment_pk>/', delete_comment, name='delete_comment'),
     path('application/update_comment/<int:comment_pk>/', update_comment_body, name='update_comment'),
     path('application/change_status/<str:app_slug>/', change_application_status, name='change_application_status'),
+
+    path('settings/notifications/', login_required(NotificationsSettingsListView.as_view()),
+         name='notifications_settings'),
+    path('settings/notifications/on_notify/', turn_on_staff_notifications, name='turn_on_notifications'),
+    path('settings/notifications/off_notify/', turn_off_staff_notifications, name='turn_off_notifications'),
 ]

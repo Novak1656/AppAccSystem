@@ -1,0 +1,93 @@
+{% extends 'base.html' %}
+{% load stuff_tags %}
+
+{% block title %} Настройки уведомлений {% endblock %}
+
+
+{% block content %}
+<div class="container text-white border-info">
+    <div class="border-bottom border-info">
+        <h1 class="display-6 mb-3">
+            Настройки уведомлений
+            | <a class="btn btn-outline-info btn-lg text-end" href="" data-bs-toggle="modal" data-bs-target="#select_staff">Добавить сотрудника для оповещений</a>
+
+            <!-- Modal Staff Select -->
+            <div class="modal fade" id="select_staff" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered">
+                    <div class="modal-content bg-transparent border">
+                        <div class="modal-header">
+                            <h5 class="modal-title text-white" id="exampleModalLabel">Выберите сотрудника/сотрудников, чтобы уведомлять его/их о новых заявках</h5>
+                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                        </div>
+                        <div class="modal-body">
+                            <form action="{% url 'turn_on_notifications' %}" method="get" id="select_staff_form">
+                                <select name="stuff" class="form-control" required="" id="id_stuff" multiple="">
+                                    {% for staff_user in staff_users %}
+                                    <option value="{{ staff_user.pk }}">{{ staff_user.get_full_name }} - {{ staff_user.role|role_normalize }}</option>
+                                    {% endfor %}
+                                </select>
+                            </form>
+                        </div>
+                        <div class="modal-footer justify-content-center">
+                            <input form="select_staff_form" type="submit" class="btn btn-outline-success text-center btn-lg" value="Подтвердить">
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- Modal Staff Select -->
+        </h1>
+    </div>
+    <br>
+    <div class="container">
+        {% if staffs %}
+        <table class="table-dark table-bordered border-info w-100">
+            <thead>
+            <tr class="text-center">
+                <th scope="col">#</th>
+                <th scope="col">ФИО</th>
+                <th scope="col">Должность</th>
+                <th scope="col"></th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for staff in staffs %}
+            <tr>
+                <th scope="row"><h3 class="fs-5 text-center">{{ forloop.counter }}.</h3></th>
+                <td><h3 class="fs-5 ms-3">{{ staff.first_name }} {{ staff.second_name }} {{ staff.last_name }}</h3></td>
+                <td class="text-center">{{ staff.role|role_normalize }}</td>
+                <td class="text-center">
+                    <button class="btn btn-outline-danger w-100 text-center border-bottom-0 border-top-0 border-start-0 border-end-0" data-bs-toggle="modal" data-bs-target="#off_notifications{{ staff.pk }}">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" fill="currentColor" class="bi bi-x-lg" viewBox="0 0 16 16">
+                            <path d="M2.146 2.854a.5.5 0 1 1 .708-.708L8 7.293l5.146-5.147a.5.5 0 0 1 .708.708L8.707 8l5.147 5.146a.5.5 0 0 1-.708.708L8 8.707l-5.146 5.147a.5.5 0 0 1-.708-.708L7.293 8 2.146 2.854Z"/>
+                        </svg>
+                    </button>
+                </td>
+                <!-- Notifications Off -->
+                <div class="modal modal-alert" tabindex="-1" role="dialog" id="off_notifications{{ staff.pk }}">
+                    <div class="modal-dialog modal-dialog-centered" role="document">
+                        <div class="modal-content rounded-4 shadow bg-info text-dark">
+                            <div class="modal-body p-4 text-center">
+                                <h5 class="mb-0">Вы действительно хотите отключить уведомления о новых заявках для сотрудника {{ staff.first_name }} {{ staff.second_name }} {{ staff.last_name }}?</h5>
+                            </div>
+                            <div class="modal-footer flex-nowrap p-0 border-top border-dark text-dark">
+                                <a type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0" href="{% url 'turn_off_notifications' %}?stuff_pk={{ staff.pk }}">Yes</a>
+                                <button type="button" class="btn btn-lg btn-link fs-6 text-decoration-none col-6 m-0 rounded-0 border-left border-left-dark" data-bs-dismiss="modal">No</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Notifications Off -->
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <div class="text-center">
+            <h1 class="display-6 mb-3">
+                Нет ни одного сотрудника у котрого включены уведомления о новых заявках.
+            </h1>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,77 @@
+from .client_views import (
+    ClientsListView,
+    ClientCreateView,
+    ClientDetailView,
+    ClientUpdateView,
+    client_delete_view,
+    ClientFilesCreateView,
+    delete_client_file
+)
+from .contact_persons_views import (
+    ContactPersonsListView,
+    ContactPersonCreateView,
+    ContactPersonDetailView,
+    ContactPersonUpdateView,
+    contact_person_delete
+)
+from .contracts_views import (
+    ContractsListView,
+    ContractsDetailView,
+    ContractsCreateView,
+    ContractsUpdateView,
+    contracts_delete_view,
+    ContractFilesCreateView,
+    delete_cont_file
+)
+from .equipments_views import (
+    EquipmentTypeListCreateView,
+    EquipmentTypeUpdateView,
+    equipment_type_delete,
+    EquipmentAttributeListView,
+    EquipmentAttributeCreateView,
+    delete_equipment_attributes,
+    EquipmentAttributeUpdateView,
+    EquipmentsListView,
+    EquipmentsCreateView,
+    EquipmentsDetailView,
+    equipments_delete_view,
+    EquipmentsUpdateView,
+    EquipmentFilesCreateView,
+    delete_eq_file
+)
+
+__all__ = [
+    'ClientsListView',
+    'ClientCreateView',
+    'ClientDetailView',
+    'ClientUpdateView',
+    'client_delete_view',
+    'ClientFilesCreateView',
+    'delete_client_file',
+    'ContactPersonsListView',
+    'ContactPersonCreateView',
+    'ContactPersonDetailView',
+    'ContactPersonUpdateView',
+    'contact_person_delete',
+    'ContractsListView',
+    'ContractsDetailView',
+    'ContractsCreateView',
+    'ContractsUpdateView',
+    'contracts_delete_view',
+    'ContractFilesCreateView',
+    'delete_cont_file',
+    'EquipmentTypeListCreateView',
+    'EquipmentTypeUpdateView',
+    'equipment_type_delete',
+    'EquipmentAttributeListView',
+    'EquipmentAttributeCreateView',
+    'delete_equipment_attributes',
+    'EquipmentAttributeUpdateView',
+    'EquipmentsListView',
+    'EquipmentsCreateView',
+    'EquipmentsDetailView',
+    'equipments_delete_view',
+    'EquipmentsUpdateView',
+    'EquipmentFilesCreateView',
+    'delete_eq_file'
+]

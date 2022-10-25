@@ -7,3 +7,10 @@ register = Library()
 def role_normalize(role):
     roles = {'admin': 'Администратор', 'dispatcher': 'Диспетчер', 'executor': 'Исполнитель'}
     return roles.get(role)
+
+
+@register.inclusion_tag('')
+def get_user_notifications():
+    context = dict()
+
+    return context

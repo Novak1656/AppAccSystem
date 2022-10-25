@@ -46,6 +46,7 @@ class StuffUsers(AbstractBaseUser, PermissionsMixin):
     created_at = models.DateTimeField(verbose_name='Дата добавления', auto_now_add=True)
     updated_at = models.DateTimeField(verbose_name='Дата изменения', auto_now=True)
     is_active = models.BooleanField(default=True)
+    notifications_active = models.BooleanField(default=False)
 
     objects = UserManager()
 
@@ -77,3 +78,31 @@ class StuffUsers(AbstractBaseUser, PermissionsMixin):
 
     def __str__(self):
         return f"{self.username}: {self.role}"
+
+
+class StuffUsersNotifications(models.Model):
+    user = models.ForeignKey(
+        verbose_name='Пользователь',
+        to=StuffUsers,
+        on_delete=models.CASCADE,
+        related_name='notifications'
+    )
+    notify_subject = models.CharField(
+        verbose_name='Тема',
+        max_length=255
+    )
+    notify_text = models.TextField(
+        verbose_name='Содержание'
+    )
+    created_at = models.DateTimeField(
+        verbose_name='Дата создания',
+        auto_now_add=True
+    )
+
+    class Meta:
+        verbose_name = 'Уведомление пользователя'
+        verbose_name_plural = 'Уведомления пользователей'
+        ordering = ['-user']
+
+    def __str__(self):
+        return f'Notify #{self.pk}'
