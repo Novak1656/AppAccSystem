@@ -94,6 +94,10 @@ class StuffUsersNotifications(models.Model):
     notify_text = models.TextField(
         verbose_name='Содержание'
     )
+    is_viewed = models.BooleanField(
+        verbose_name='Просмотрено',
+        default=False
+    )
     created_at = models.DateTimeField(
         verbose_name='Дата создания',
         auto_now_add=True
@@ -102,7 +106,7 @@ class StuffUsersNotifications(models.Model):
     class Meta:
         verbose_name = 'Уведомление пользователя'
         verbose_name_plural = 'Уведомления пользователей'
-        ordering = ['-user']
+        ordering = ['-created_at']
 
     def __str__(self):
         return f'Notify #{self.pk}'

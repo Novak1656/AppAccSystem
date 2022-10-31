@@ -37,16 +37,10 @@ class ApplicationsForms(forms.ModelForm):
 class ApplicationCommentsForms(forms.ModelForm):
     class Meta:
         model = ApplicationComments
-        fields = ['comment_body', 'is_private', 'is_public', 'file']
+        fields = ['comment_body', 'is_public', 'file']
         widgets = {
             'comment_body': forms.Textarea(
                 attrs={'class': 'form-control', 'placeholder': 'Введите ваш комментарий...'}
             ),
             'file': forms.FileInput(attrs={'class': 'form-control'})
         }
-
-    def clean(self):
-        is_private = self.cleaned_data['is_private']
-        is_public = self.cleaned_data['is_public']
-        if is_private and is_public:
-            raise ValidationError('Выберите только один статус (Публичный или приватный).')

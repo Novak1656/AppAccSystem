@@ -24,4 +24,6 @@ urlpatterns = [
          name='notifications_settings'),
     path('settings/notifications/on_notify/', turn_on_staff_notifications, name='turn_on_notifications'),
     path('settings/notifications/off_notify/', turn_off_staff_notifications, name='turn_off_notifications'),
+    path('notifications/is_viewed/', notification_is_viewed, name='notification_is_viewed'),
+    path('notifications/delete/', delete_notification, name='delete_notification'),
 ]

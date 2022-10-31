@@ -114,7 +114,7 @@ def stuff_user_delete(request, user_pk):
 
 def stuff_user_auth(request):
     if request.user.is_authenticated:
-        return redirect('stuff_list')
+        return redirect('app_list')
     if request.method == 'POST':
         form = StuffUserLoginForm(data=request.POST)
         if form.is_valid():
@@ -123,7 +123,7 @@ def stuff_user_auth(request):
                 messages.error(request, 'Ваша учетная запись заблокирована, обратитесь к администратору системы')
             else:
                 login(request, user)
-                return redirect('stuff_list')
+                return redirect('app_list')
     else:
         form = StuffUserLoginForm()
     return render(request, 'stuff_app/login_page.html', {'form': form})

@@ -1,0 +1,19 @@
+<div class="col">
+    {% for contract in contracts_search_results %}
+    <div class="card h-100 w-75 bg-dark border border-info rounded">
+        <div class="card-title text-start bg-info">
+            <h2>{{ contract.title }}</h2>
+        </div>
+        <div class="card-body">
+            <p>О договоре: {{ contract.note }}</p>
+        </div>
+        {% if request.user.is_staff %}
+        <div class="card-footer border-info">
+            <div class="d-flex align-items-center">
+                <a href="{{ contract.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>

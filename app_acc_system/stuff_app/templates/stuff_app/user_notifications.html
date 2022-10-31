@@ -1,0 +1,49 @@
+<div class="dropdown">
+    <a class="btn btn-dark dropdown-toggle" href="#" role="button" id="dropdownMenuLink1" data-bs-toggle="dropdown" aria-expanded="false">
+        <svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+            <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+        </svg>
+        {% if notifications.exists %}
+        <span class="badge bg-danger">{{ new_notify_cnt }}</span>
+        {% endif %}
+    </a>
+    <ul class="dropdown-menu dropdown-menu-dark dropdown-menu-end">
+        {% for notify_obj in notifications %}
+        <div class="row mb-2">
+            <button class="btn {% if notify_obj.is_viewed %}btn-success{% else %}btn-warning{% endif %}" data-bs-toggle="modal" data-bs-target="#notify_description{{ notify_obj.pk }}">
+                {{ notify_obj.notify_subject }}<br>{{ notify_obj.created_at }}
+            </button>
+        </div>
+        {% empty %}
+        <div class="text-center">
+            <p>У вас нет уведомлений.</p>
+        </div>
+        {% endfor %}
+    </ul>
+</div>
+<div>
+    {% for notify_obj in notifications %}
+    <!-- Notification Description -->
+    <div class="modal fade" id="notify_description{{ notify_obj.pk }}">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content rounded-4 shadow bg-info text-dark">
+                <div class="modal-header">
+                    <h2 class="fs-5">{{ notify_obj.notify_subject }}</h2>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body p-4">
+                    <p class="fs-5">{{ notify_obj.notify_text|safe }}</p>
+                </div>
+                <div class="modal-footer">
+                    <div class="btn-group me-5">
+                        <a href="{% url 'notification_is_viewed' %}?notify_pk={{ notify_obj.pk }}" class="btn btn-success">Просмотрено</a>
+                        <a href="{% url 'delete_notification' %}?notify_pk={{ notify_obj.pk }}" class="btn btn-danger">Удалить</a>
+                    </div>
+                    <h2 class="fs-6">{{ notify_obj.created_at }}</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Notification Description -->
+    {% endfor %}
+</div>

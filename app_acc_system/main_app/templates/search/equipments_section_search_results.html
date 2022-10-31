@@ -1,0 +1,22 @@
+<div class="col">
+    {% for equipment in equipments_search_results %}
+    <div class="card h-100 w-75 bg-dark border border-info rounded">
+        <div class="card-title text-start bg-info">
+            <h2>{{ equipment.name }}</h2>
+        </div>
+        <div class="card-body">
+            <ul class="fs-4">
+                <li>Об оборудовании: {{ equipment.note }}</li>
+                <li>Атрибуты: <ul>{% for attr in equipment.attribute.all %}<li class="fs-4">{{ forloop.counter }}. {{ attr.name }}</li>{% endfor %}</ul></li>
+            </ul>
+        </div>
+        {% if request.user.is_staff %}
+        <div class="card-footer border-info">
+            <div class="d-flex align-items-center">
+                <a href="{{ equipment.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>

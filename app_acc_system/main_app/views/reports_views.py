@@ -1,146 +1,19 @@
 import io
-import os
-import shutil
+
 import xlsxwriter
-from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import AccessMixin
 from django.core.files import File
-from django.db.models import Q, Count, Case, When, Sum, F, IntegerField
-from django.http import Http404
+from django.db.models import Sum, Count, Case, When, F, IntegerField, Q
 from django.shortcuts import redirect
-from django.urls import reverse_lazy, reverse
+from django.urls import reverse, reverse_lazy
 from django.utils import dateformat
 from django.utils.timezone import now
-from django.views.generic import ListView, CreateView
-from .models import Applications, ApplicationComments, Reports
+from django.views.generic import ListView
+
 from client_app.models import Clients
-from .forms import ApplicationsForms, ApplicationCommentsForms
-from stuff_app.models import StuffUsers
-
-
-def chek_is_staff(user) -> None:
-    if not user.is_staff:
-        raise Http404
-    return
-
-
-class ApplicationsListView(AccessMixin, ListView):
-    model = Applications
-    template_name = 'main_app/applications_list.html'
-    context_object_name = 'applications'
-    login_url = reverse_lazy('stuff_user_auth')
-
-    def get_queryset(self):
-        return Applications.objects.select_related('client', 'contact_person').all()
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(ApplicationsListView, self).get_context_data(**kwargs)
-        context['clients'] = Clients.objects.values('pk', 'name').all()
-        return context
-
-
-class ApplicationCreateView(AccessMixin, CreateView):
-    model = Applications
-    template_name = 'main_app/applications_create.html'
-    form_class = ApplicationsForms
-    success_url = reverse_lazy('app_list')
-    login_url = reverse_lazy('stuff_user_auth')
-
-    def get_form_kwargs(self):
-        kwargs = {
-            'client_id': self.request.GET.get('client'),
-        }
-        if self.request.method in ('POST', 'PUT'):
-            kwargs.update({
-                'data': self.request.POST,
-            })
-        return kwargs
-
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.client = Clients.objects.get(pk=self.request.GET.get('client'))
-        self.object.save()
-        form.save_m2m()
-        return super(ApplicationCreateView, self).form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super(ApplicationCreateView, self).get_context_data(**kwargs)
-        context['client'] = Clients.objects.get(pk=self.request.GET.get('client'))
-        return context
-
-
-class ApplicationDetailView(AccessMixin, CreateView):
-    model = Applications
-    template_name = 'main_app/applications_detail.html'
-    login_url = reverse_lazy('stuff_user_auth')
-    slug_url_kwarg = 'app_slug'
-    form_class = ApplicationCommentsForms
-
-    def get_success_url(self):
-        return reverse('app_detail', kwargs={'app_slug': self.kwargs['app_slug']})
-    
-    def form_valid(self, form):
-        self.object = form.save(commit=False)
-        self.object.application = self.get_context_data().get('application')
-        self.object.save()
-        return super(ApplicationDetailView, self).form_valid(form)
-
-    def get_context_data(self, **kwargs):
-        context = super(ApplicationDetailView, self).get_context_data(**kwargs)
-        context['executors'] = StuffUsers.objects.filter(role='executor').all()
-        context['application'] = Applications.objects.select_related(
-            'client', 'contact_person', 'contract', 'executor'
-        ).prefetch_related('equipment', 'comments').get(slug=self.kwargs['app_slug'])
-        status_list = {
-            'New': [('At work', 'В работе'), ('Postponed', 'Отложена')],
-            'At work': [('Postponed', 'Отложена'), ('Solved', 'Решена')],
-            'Postponed': [('At work', 'В работе'), ('Solved', 'Решена')],
-            'Solved': [('At work', 'В работе'), ('Postponed', 'Отложена'), ('Closed', 'Закрыта')],
-        }
-        context['status_list'] = status_list.get(context['application'].status)
-        return context
-
-
-@login_required
-def set_application_executor(request, app_slug):
-    application = Applications.objects.get(slug=app_slug)
-    executor = StuffUsers.objects.get(pk=request.GET.get('executor'))
-    application.executor = executor
-    application.save()
-    return redirect('app_detail', app_slug=app_slug)
-
-
-@login_required
-def update_comment_body(request, comment_pk):
-    ApplicationComments.objects.filter(pk=comment_pk).update(comment_body=request.POST[f'comment_body{comment_pk}'])
-    return redirect(request.META['HTTP_REFERER'])
-
-
-@login_required
-def delete_comment(request, comment_pk):
-    ApplicationComments.objects.get(pk=comment_pk).delete()
-    return redirect(request.META['HTTP_REFERER'])
-
-
-@login_required
-def delete_application(request, app_slug):
-    application = Applications.objects.prefetch_related('comments').get(slug=app_slug)
-    if application.comments.all().filter(~Q(file=None)).exists():
-        files_path = os.path.join(settings.BASE_DIR, f"media/Comment_files/{application.subject}/")
-        shutil.rmtree(files_path)
-    application.delete()
-    return redirect('app_list')
-
-
-@login_required
-def change_application_status(request, app_slug):
-    status = request.GET.get('status')
-    if status == 'Closed':
-        Applications.objects.filter(slug=app_slug).update(status=status, closing_date=now())
-    else:
-        Applications.objects.filter(slug=app_slug).update(status=status)
-    return redirect('app_detail', app_slug=app_slug)
+from client_app.services import chek_is_staff
+from main_app.models import Reports, Applications
 
 
 class ReportsListView(AccessMixin, ListView):
@@ -388,45 +261,3 @@ def delete_report_view(request):
     rep_pk = request.GET.get('rep_pk')
     Reports.objects.get(pk=rep_pk).delete()
     return redirect(request.META['HTTP_REFERER'])
-
-
-class NotificationsSettingsListView(AccessMixin, ListView):
-    model = StuffUsers
-    template_name = 'main_app/notifications_settings.html'
-    context_object_name = 'staffs'
-    login_url = reverse_lazy('stuff_user_auth')
-
-    def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
-        return super(NotificationsSettingsListView, self).dispatch(request, *args, **kwargs)
-
-    def get_queryset(self):
-        return self.model.objects.filter(notifications_active=True).values(
-            'pk', 'first_name', 'second_name', 'last_name', 'role'
-        ).order_by('role')
-
-    def get_context_data(self, *, object_list=None, **kwargs):
-        context = super(NotificationsSettingsListView, self).get_context_data(**kwargs)
-        context['staff_users'] = StuffUsers.objects.filter(notifications_active=False)
-        return context
-
-
-@login_required
-def turn_on_staff_notifications(request):
-    stuffs = request.GET.getlist('stuff')
-    stuffs_queryset = StuffUsers.objects.filter(pk__in=stuffs)
-    for stuff_obj in stuffs_queryset:
-        stuff_obj.notifications_active = True
-    StuffUsers.objects.bulk_update(stuffs_queryset, ['notifications_active'])
-    return redirect('notifications_settings')
-
-
-@login_required
-def turn_off_staff_notifications(request):
-    StuffUsers.objects.filter(pk=request.GET.get('stuff_pk')).update(notifications_active=False)
-    return redirect('notifications_settings')
-
-
-# Добавить метода для разных уведомлений
-# Добавить систему уведомлений пользователя
-# Написать тег для вывода кнопки уведомлений и списка уведомлений

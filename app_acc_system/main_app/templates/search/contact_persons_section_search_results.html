@@ -1,0 +1,26 @@
+<div class="col">
+    {% for contact_person in contact_persons_search_results %}
+    <div class="card h-100 w-75 bg-dark border border-info rounded">
+        <div class="card-title text-start bg-info">
+            <h2>{{ contact_person.get_full_name }}</h2>
+        </div>
+        <div class="card-body">
+            <ul class="fs-4">
+                <li>Фамилия: {{ contact_person.first_name }}</li>
+                <li>Имя: {{ contact_person.second_name }}</li>
+                <li>Отчество: {{ contact_person.last_name }}</li>
+                <li>Email: {{ contact_person.email }}</li>
+                <li>Телефон: {{ contact_person.phone }}</li>
+                <li>Об контактном лице: {{ contact_person.note }}</li>
+            </ul>
+        </div>
+        {% if request.user.is_staff %}
+        <div class="card-footer border-info">
+            <div class="d-flex align-items-center">
+                <a href="{{ contact_person.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+    {% endfor %}
+</div>
