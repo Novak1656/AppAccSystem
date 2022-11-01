@@ -1,26 +1,34 @@
-<div class="col">
+{% load main_search_tags %}
+
+<button class="container btn navbar bg-primary bg-opacity-75 navbar-toggler text-white p-3 mt-3" data-bs-toggle="collapse" data-bs-target="#contact_persons_search_results">
+    <div>
+        <h2>Результатов поиска: <span class="badge bg-danger">{{ contact_persons_search_results.count }}</span></h2>
+    </div>
+</button>
+<div class="collapse text-white border border-info rounded" id="contact_persons_search_results">
     {% for contact_person in contact_persons_search_results %}
-    <div class="card h-100 w-75 bg-dark border border-info rounded">
-        <div class="card-title text-start bg-info">
-            <h2>{{ contact_person.get_full_name }}</h2>
-        </div>
-        <div class="card-body">
-            <ul class="fs-4">
-                <li>Фамилия: {{ contact_person.first_name }}</li>
-                <li>Имя: {{ contact_person.second_name }}</li>
-                <li>Отчество: {{ contact_person.last_name }}</li>
-                <li>Email: {{ contact_person.email }}</li>
-                <li>Телефон: {{ contact_person.phone }}</li>
-                <li>Об контактном лице: {{ contact_person.note }}</li>
-            </ul>
-        </div>
-        {% if request.user.is_staff %}
-        <div class="card-footer border-info">
-            <div class="d-flex align-items-center">
-                <a href="{{ contact_person.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
-            </div>
-        </div>
-        {% endif %}
+    <div class="border-bottom border-info">
+        {% highlight_search_words text=contact_person.get_full_name search_word=search_word as full_name %}
+        <a href="{{ contact_person.get_absolute_url }}" class="text-decoration-none text-info"><h2>{{ full_name.text|safe }}</h2></a>
+        <ul class="fs-4">
+            {% highlight_search_words text=contact_person.first_name search_word=search_word as first_name %}
+            {% if first_name.is_search %}<li>Фамилия: {{ first_name.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=contact_person.second_name search_word=search_word as second_name %}
+            {% if second_name.is_search %}<li>Имя: {{ second_name.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=contact_person.last_name search_word=search_word as last_name %}
+            {% if last_name.is_search %}<li>Отчество: {{ last_name.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=contact_person.email search_word=search_word as email %}
+            {% if email.is_search %}<li>Email: {{ email.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=contact_person.phone.raw_input search_word=search_word as phone %}
+            {% if phone.is_search %}<li>Телефон: {{ phone.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=contact_person.note search_word=search_word as note %}
+            {% if note.is_search %}<li>Об контактном лице: {{ note.text|safe }}</li>{% endif %}
+        </ul>
     </div>
     {% endfor %}
 </div>

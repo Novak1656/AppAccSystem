@@ -9,29 +9,29 @@
 <div class="container text-white border-info">
     <div class="border-bottom border-info">
         <h1 class="display-6 mb-3">
-            Результаты поиска по <strong>{{ search_work }}</strong>
+            Результаты поиска по запросу: <strong>"{{ search_word }}"</strong>
         </h1>
     </div>
     <br>
     <div class="container">
-        {% for results, section in search_results %}
+        {% for section, results in search_results.items %}
         <div class="row">
             <div class="border-bottom border-info">
                 <h1 class="display-6 mb-3">
-                    {{ section }}
+                    {{ section|title }}
                 </h1>
             </div>
             <br>
             {% if section == 'clients' %}
-                {% get_clients_section_search_results search_results=results %}
-            {% elif section == 'contact_persons' %}
-                {% get_contact_persons_section_search_results search_results=results %}
-            {% elif section == 'contracts_section' %}
-                {% get_contracts_section_search_results search_results=results %}
+                {% get_clients_section_search_results search_results=results search_word=search_word %}
+            {% elif section == 'contactpersons' %}
+                {% get_contact_persons_section_search_results search_results=results search_word=search_word %}
+            {% elif section == 'contracts' %}
+                {% get_contracts_section_search_results search_results=results search_word=search_word %}
             {% elif section == 'equipments' %}
-                {% get_equipments_section_search_results search_results=results %}
+                {% get_equipments_section_search_results search_results=results search_word=search_word %}
             {% else %}
-                {% get_applications_section_search_results search_results=results %}
+                {% get_applications_section_search_results search_results=results search_word=search_word %}
             {% endif %}
 
             {% empty %}

@@ -26,4 +26,6 @@ urlpatterns = [
     path('settings/notifications/off_notify/', turn_off_staff_notifications, name='turn_off_notifications'),
     path('notifications/is_viewed/', notification_is_viewed, name='notification_is_viewed'),
     path('notifications/delete/', delete_notification, name='delete_notification'),
+
+    path('search/results/', SearchView.as_view(), name='global_search'),
 ]

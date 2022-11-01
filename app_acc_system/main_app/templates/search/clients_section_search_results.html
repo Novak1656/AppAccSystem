@@ -1,29 +1,43 @@
-<div class="col">
+{% load main_search_tags %}
+
+<button class="container btn navbar bg-primary bg-opacity-75 navbar-toggler text-white p-3 mt-3" data-bs-toggle="collapse" data-bs-target="#clients_search_results">
+    <div>
+        <h2>Результатов поиска: <span class="badge bg-danger">{{ clients_search_results.count }}</span></h2>
+    </div>
+</button>
+<div class="collapse text-white border border-info rounded" id="clients_search_results">
     {% for client in clients_search_results %}
-    <div class="card h-100 w-75 bg-dark border border-info rounded">
-        <div class="card-title text-start bg-info">
-            <h2>{{ client.name }}</h2>
-        </div>
-        <div class="card-body">
-            <ul class="fs-4">
-                <li>Доп. название: {{ client.second_name }}</li>
-                <li>Email: {{ client.email }}</li>
-                <li>Сайт: {{ client.site }}</li>
-                <li>Об клиенте: {{ client.note }}</li>
-                <li>Юридический адрес: {{ client.legal_address }}</li>
-                <li>Адрес офиса: {{ client.office_address }}</li>
-                <li>ИНН: {{ client.inn }}</li>
-                <li>ОГРН: {{ client.ogrn }}</li>
-                <li>КПП: {{ client.kpp }}</li>
-            </ul>
-        </div>
-        {% if request.user.is_staff %}
-        <div class="card-footer border-info">
-            <div class="d-flex align-items-center">
-                <a href="{{ client.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
-            </div>
-        </div>
-        {% endif %}
+    <div class="border-bottom border-info">
+        {% highlight_search_words text=client.name search_word=search_word as name %}
+        <a href="{{ client.get_absolute_url }}" class="text-decoration-none text-info"><h2>{{ name.text|safe }}</h2></a>
+        <ul class="fs-4">
+            {% highlight_search_words text=client.second_name search_word=search_word as second_name %}
+            {% if second_name.is_search %}<li>Доп. название: {{ second_name.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=client.email search_word=search_word as email %}
+            {% if email.is_search %}<li>Email: {{ email.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=client.site search_word=search_word as site %}
+            {% if site.is_search %}<li>Сайт: {{ site.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=client.note search_word=search_word as note %}
+            {% if note.is_search %}<li>Об клиенте: {{ note.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=client.legal_address search_word=search_word as legal_address %}
+            {% if legal_address.is_search %}<li>Юридический адрес: {{ legal_address.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=client.office_address search_word=search_word as office_address %}
+            {% if office_address.is_search %}<li>Адрес офиса: {{ office_address.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=client.inn search_word=search_word as inn %}
+            {% if inn.is_search %}<li>ИНН: {{ inn.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=client.ogrn search_word=search_word as ogrn %}
+            {% if ogrn.is_search %}<li>ОГРН: {{ ogrn.text|safe }}</li>{% endif %}
+
+            {% highlight_search_words text=client.kpp search_word=search_word as kpp %}
+            {% if kpp.is_search %}<li>КПП: {{ kpp.text|safe }}</li>{% endif %}
+        </ul>
     </div>
     {% endfor %}
 </div>

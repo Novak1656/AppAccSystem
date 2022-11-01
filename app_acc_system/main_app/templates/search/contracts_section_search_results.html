@@ -1,19 +1,19 @@
-<div class="col">
+{% load main_search_tags %}
+
+<button class="container btn navbar bg-primary bg-opacity-75 navbar-toggler text-white p-3 mt-3" data-bs-toggle="collapse" data-bs-target="#contracts_search_results">
+    <div>
+        <h2>Результатов поиска: <span class="badge bg-danger">{{ contracts_search_results.count }}</span></h2>
+    </div>
+</button>
+<div class="collapse text-white border border-info rounded" id="contracts_search_results">
     {% for contract in contracts_search_results %}
-    <div class="card h-100 w-75 bg-dark border border-info rounded">
-        <div class="card-title text-start bg-info">
-            <h2>{{ contract.title }}</h2>
-        </div>
-        <div class="card-body">
-            <p>О договоре: {{ contract.note }}</p>
-        </div>
-        {% if request.user.is_staff %}
-        <div class="card-footer border-info">
-            <div class="d-flex align-items-center">
-                <a href="{{ contract.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
-            </div>
-        </div>
-        {% endif %}
+    <div class="border-bottom border-info">
+        {% highlight_search_words text=contract.title search_word=search_word as title %}
+        <a href="{{ contract.get_absolute_url }}" class="text-decoration-none text-info"><h2>{{ title.text|safe }}</h2></a>
+        <ul class="fs-4">
+            {% highlight_search_words text=contract.note search_word=search_word as note %}
+            {% if note.is_search %}<li>О договоре: {{ note.text|safe }}</li>{% endif %}
+        </ul>
     </div>
     {% endfor %}
 </div>

@@ -1,21 +1,27 @@
-<div class="col">
+{% load main_search_tags %}
+
+<button class="container btn navbar bg-primary bg-opacity-75 navbar-toggler text-white p-3 mt-3" data-bs-toggle="collapse" data-bs-target="#applications_search_results">
+    <div>
+        <h2>Результатов поиска: <span class="badge bg-danger">{{ applications_search_results.count }}</span></h2>
+    </div>
+</button>
+<div class="collapse text-white border border-info rounded" id="applications_search_results">
     {% for application in applications_search_results %}
-    <div class="card h-100 w-75 bg-dark border border-info rounded">
-        <div class="card-title text-start bg-info">
-            <h2>{{ application.subject }}</h2>
-        </div>
-        <div class="card-body">
-            <ul class="fs-4">
-                <li>Описание заявки: {{ application.description }}</li>
-            </ul>
-        </div>
-        {% if request.user.is_staff %}
-        <div class="card-footer border-info">
-            <div class="d-flex align-items-center">
-                <a href="{{ application.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
-            </div>
-        </div>
-        {% endif %}
+    <div class="border-bottom border-info">
+        {% highlight_search_words text=application.subject search_word=search_word as subject %}
+        <a href="{{ application.get_absolute_url }}" class="text-decoration-none text-info"><h2>{{ subject.text|safe }}</h2></a>
+        <ul class="fs-4">
+            {% highlight_search_words text=application.description search_word=search_word as description %}
+            {% if description.is_search %}<li>Описание заявки: {{ description.text|safe }}</li>{% endif %}
+            <li>Комментарии:
+                <ul>
+                    {% for comment in application.comments.all %}
+                    {% highlight_search_words text=comment.comment_body search_word=search_word as comment_body %}
+                    {% if comment_body.is_search %}<li class="fs-4">{{ forloop.counter }}. {{ comment_body.text|safe }}</li>{% endif %}
+                    {% endfor %}
+                </ul>
+            </li>
+        </ul>
     </div>
     {% endfor %}
 </div>

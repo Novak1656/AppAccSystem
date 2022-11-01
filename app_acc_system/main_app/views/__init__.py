@@ -22,6 +22,7 @@ from .notifications_views import (
     delete_notification,
     notification_is_viewed
 )
+from .search_views import SearchView
 
 __all__ = [
     'ReportsListView',
@@ -41,5 +42,6 @@ __all__ = [
     'turn_on_staff_notifications',
     'turn_off_staff_notifications',
     'delete_notification',
-    'notification_is_viewed'
+    'notification_is_viewed',
+    'SearchView'
 ]
