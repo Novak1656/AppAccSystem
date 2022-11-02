@@ -5,13 +5,14 @@ from django.conf import settings
 from django.contrib.auth.decorators import login_required
 from django.contrib.auth.mixins import AccessMixin
 from django.db.models import Q
+from django.http import Http404
 from django.shortcuts import redirect, get_object_or_404
 from django.urls import reverse, reverse_lazy
 from django.views.generic import CreateView, UpdateView, DetailView, ListView
 
 from ..forms import EquipmentFilesForm, EquipmentsForms, EquipmentAttributeForms, EquipmentTypeForms
 from ..models import EquipmentFiles, Equipments, EquipmentAttribute, EquipmentType, Clients
-from ..services import chek_is_staff
+from ..services import chek_access_rights
 
 
 class EquipmentTypeListCreateView(AccessMixin, CreateView):
@@ -22,7 +23,8 @@ class EquipmentTypeListCreateView(AccessMixin, CreateView):
     success_url = reverse_lazy('e_types_list')
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        if not request.user.is_staff:
+            raise Http404
         return super(EquipmentTypeListCreateView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -39,7 +41,8 @@ class EquipmentTypeUpdateView(AccessMixin, UpdateView):
     success_url = reverse_lazy('e_types_list')
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        if not request.user.is_staff:
+            raise Http404
         return super(EquipmentTypeUpdateView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -50,7 +53,8 @@ class EquipmentTypeUpdateView(AccessMixin, UpdateView):
 
 @login_required
 def equipment_type_delete(request, pk):
-    chek_is_staff(request.user)
+    if not request.user.is_staff:
+        raise Http404
     EquipmentType.objects.get(pk=pk).delete()
     return redirect('e_types_list')
 
@@ -62,7 +66,8 @@ class EquipmentAttributeListView(AccessMixin, ListView):
     login_url = reverse_lazy('stuff_user_auth')
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        if not request.user.is_staff:
+            raise Http404
         return super(EquipmentAttributeListView, self).dispatch(request, *args, **kwargs)
 
 
@@ -74,13 +79,15 @@ class EquipmentAttributeCreateView(AccessMixin, CreateView):
     login_url = reverse_lazy('stuff_user_auth')
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        if not request.user.is_staff:
+            raise Http404
         return super(EquipmentAttributeCreateView, self).dispatch(request, *args, **kwargs)
 
 
 @login_required
 def delete_equipment_attributes(request, pk):
-    chek_is_staff(request.user)
+    if not request.user.is_staff:
+        raise Http404
     EquipmentAttribute.objects.get(pk=pk).delete()
     return redirect('e_attrs_list')
 
@@ -93,7 +100,8 @@ class EquipmentAttributeUpdateView(AccessMixin, UpdateView):
     login_url = reverse_lazy('stuff_user_auth')
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        if not request.user.is_staff:
+            raise Http404
         return super(EquipmentAttributeUpdateView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -114,7 +122,7 @@ class EquipmentsListView(AccessMixin, ListView):
             .filter(client__slug=self.kwargs['client_slug'])
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(EquipmentsListView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -133,7 +141,7 @@ class EquipmentsCreateView(AccessMixin, CreateView):
         return reverse('eq_list', kwargs={'client_slug': self.kwargs['client_slug']})
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(EquipmentsCreateView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -157,7 +165,7 @@ class EquipmentsDetailView(AccessMixin, DetailView):
             select_related('type').prefetch_related('attribute', 'files').all()
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(EquipmentsDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -168,7 +176,7 @@ class EquipmentsDetailView(AccessMixin, DetailView):
 
 @login_required
 def equipments_delete_view(request, eq_slug):
-    chek_is_staff(request.user)
+    chek_access_rights(request.user)
     eq = Equipments.objects.select_related('client').get(slug=eq_slug)
     client_slug = eq.client.slug
     if eq.files.exists():
@@ -208,7 +216,7 @@ class EquipmentsUpdateView(AccessMixin, UpdateView):
         return super(EquipmentsUpdateView, self).form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(EquipmentsUpdateView, self).dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
@@ -232,7 +240,7 @@ class EquipmentFilesCreateView(AccessMixin, CreateView):
         return reverse('eq_detail', kwargs={'eq_slug': self.kwargs['eq_slug']})
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(EquipmentFilesCreateView, self).dispatch(request, *args, **kwargs)
 
     def form_valid(self, form):
@@ -244,7 +252,7 @@ class EquipmentFilesCreateView(AccessMixin, CreateView):
 
 @login_required
 def delete_eq_file(request, file_slug):
-    chek_is_staff(request.user)
+    chek_access_rights(request.user)
     eq_file = EquipmentFiles.objects.select_related('equipment').get(slug=file_slug)
     eq_slug = eq_file.equipment.slug
     eq_file.delete()

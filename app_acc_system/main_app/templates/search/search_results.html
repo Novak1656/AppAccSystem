@@ -16,12 +16,6 @@
     <div class="container">
         {% for section, results in search_results.items %}
         <div class="row">
-            <div class="border-bottom border-info">
-                <h1 class="display-6 mb-3">
-                    {{ section|title }}
-                </h1>
-            </div>
-            <br>
             {% if section == 'clients' %}
                 {% get_clients_section_search_results search_results=results search_word=search_word %}
             {% elif section == 'contactpersons' %}

@@ -17,7 +17,7 @@ from main_app.services import new_application_notification, new_comment_notifica
     new_executor_application_notification, application_status_change_notification
 from stuff_app.models import StuffUsers
 
-# Поработать с правами доступа (исполнитель может видеть приватные комменты только для своих заявок)
+
 class ApplicationsListView(AccessMixin, ListView):
     model = Applications
     template_name = 'main_app/applications_list.html'
@@ -25,7 +25,10 @@ class ApplicationsListView(AccessMixin, ListView):
     login_url = reverse_lazy('stuff_user_auth')
 
     def get_queryset(self):
-        return Applications.objects.select_related('client', 'contact_person', 'executor').all()
+        applications = Applications.objects.select_related('client', 'contact_person', 'executor').all()
+        if self.request.user.role == 'executor':
+            return applications.filter(executor=self.request.user)
+        return applications
 
     def get_context_data(self, *, object_list=None, **kwargs):
         context = super(ApplicationsListView, self).get_context_data(**kwargs)
@@ -87,7 +90,10 @@ class ApplicationDetailView(AccessMixin, CreateView):
         context['executors'] = StuffUsers.objects.filter(role='executor').all()
         context['application'] = Applications.objects.select_related(
             'client', 'contact_person', 'contract', 'executor'
-        ).prefetch_related('equipment', 'comments').get(slug=self.kwargs['app_slug'])
+        ).prefetch_related(
+            'equipment', 'comments', 'client__files', 'equipment__files',
+            'equipment__type', 'equipment__attribute', 'contract__files'
+        ).get(slug=self.kwargs['app_slug'])
         status_list = {
             'New': [('At work', 'В работе'), ('Postponed', 'Отложена')],
             'At work': [('Postponed', 'Отложена'), ('Solved', 'Решена')],

@@ -20,8 +20,10 @@
                 {% endif %}
                 <p class="fs-3">
                     Исполнитель:
-                    {% if application.executor %}
+                    {% if application.executor and user.role != 'executor' %}
                     <a href="{{ application.executor.get_absolute_url }}">{{ application.executor.get_full_name }}</a>
+                    {% elif application.executor and user.role == 'executor' %}
+                    {{ application.executor.get_full_name }}
                     {% else %}
                     -
                     {% endif %}
@@ -36,8 +38,9 @@
                 <a class="btn btn-outline-secondary btn-lg w-100" href="" data-bs-toggle="modal" data-bs-target="#change_status">Сменить статус заявки</a>
                 <br>
                 {% endif %}
+                {% if user.role != 'executor' %}
                 <button class="btn btn-outline-danger btn-lg w-100" data-bs-toggle="modal" data-bs-target="#delete_application{{ application.pk }}">Удалить заявку</button>
-
+                {% endif %}
                 <!-- Modal Executors -->
                 <div class="modal fade" id="select_executor" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
                     <div class="modal-dialog modal-dialog-centered">
@@ -123,15 +126,16 @@
             <div class="text-white container">
                 <div class="container border-bottom border-info">
                     <h1 class="fs-1">Данные клиента</h1>
-                    <p class="fs-2">Клиент: <a href="{{ application.client.get_absolute_url }}">{{ application.client.name }}</a></p>
+                    <p class="fs-2">Клиент: <a href="" data-bs-toggle="modal" data-bs-target="#show_client_data{{ application.client.pk }}">{{ application.client.name }}</a></p>
                     <p class="fs-2">Контакт: <a href="" data-bs-toggle="modal" data-bs-target="#show_cp_data{{ application.contact_person.pk }}">{{ application.contact_person.get_full_name }}</a></p>
-                    <p class="fs-2">Договор: <a href="{{ application.contract.get_absolute_url }}">{{ application.contract.title }}</a></p>
+                    <p class="fs-2">Договор: <a href="" data-bs-toggle="modal" data-bs-target="#show_contract_data{{ application.contract.pk }}">{{ application.contract.title }}</a></p>
                     <p class="fs-2">Оборудование:</p>
                     <ul>
                         {% for eq in application.equipment.all %}
                             <li class="fs-2">
-                                <a href="{{ eq.get_absolute_url }}">{{ eq.name }}</a>
+                                <a href="" data-bs-toggle="modal" data-bs-target="#show_equipment_data{{ eq.pk }}">{{ eq.name }}</a>
                             </li>
+                        {% include 'inc/_application_equipment_info.html' %}
                         {% endfor %}
                     </ul>
                 </div>
@@ -142,24 +146,9 @@
                 </div>
                 {% endif %}
             </div>
-            <!-- Modal Contact person -->
-            <div class="modal modal-alert" tabindex="-1" role="dialog" id="show_cp_data{{ application.contact_person.pk }}">
-                <div class="modal-dialog modal-dialog-centered" role="document">
-                    <div class="modal-content rounded-4 shadow bg-info text-dark">
-                        <div class="modal-header">
-                            <h5 class="mb-0 text-center">Контактные данные компании</h5>
-                            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                        </div>
-                        <div class="modal-body p-4 text-start bg-white">
-                            <p class="fs-3 border-bottom">ФИО: {{ application.contact_person.get_full_name }}</p>
-                            <p class="fs-3 border-bottom">Должность: {{ application.contact_person.post }}</p>
-                            <p class="fs-3 border-bottom">Email: {{ application.contact_person.email }}</p>
-                            <p class="fs-3">Телефон: {{ application.contact_person.phone }}</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-            <!-- Modal Contact person -->
+            {% include 'inc/_application_contact_person_info.html' %}
+            {% include 'inc/_application_client_info.html' %}
+            {% include 'inc/_application_contract_info.html' %}
         </div>
     </div>
     <div class="row mt-3">
@@ -169,7 +158,7 @@
         <div class="container w-75">
             {% if application.comments %}
             {% for comment in application.comments.all %}
-            {% if comment.is_private and user.is_staff %}
+            {% if comment.is_private and user.is_staff or user.role == 'executor' %}
             <div class="card bg-dark border-info mt-3">
                 <div class="card-body">
                     <p class="fs-5 ms-2">{{ comment.comment_body }}</p>

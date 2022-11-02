@@ -34,12 +34,14 @@
                     <li class="nav-item mx-1">
                         <a class="nav-link text-white" aria-current="page" href="{% url 'app_list' %}">Заявки</a>
                     </li>
+                    {% if user.role != 'executor' %}
                     <li class="nav-item mx-1">
                         <a class="nav-link text-white" href="{% url 'stuff_list' %}">Исполнители</a>
                     </li>
                     <li class="nav-item mx-1">
                         <a class="nav-link text-white" href="{% url 'clients_list' %}">Клиенты</a>
                     </li>
+                    {% endif %}
                     {% if user.is_staff %}
                     <li class="nav-item mx-1">
                         <a class="nav-link text-white" aria-current="page" href="{% url 'reports_list' %}">Отчёты</a>

@@ -44,28 +44,26 @@
     <div class="container">
         <div class="row">
             {% for application in applications %}
-            <div class="col">
-                <div class="card h-100 w-75 bg-dark border border-info rounded">
-                    <div class="card-title text-start bg-info">
-                        <h2><span class="badge bg-dark rounded-circle mt-2">#{{ application.pk }}</span> {{ application.subject }}</h2>
+            <div class="col-3 mb-2">
+                <div class="card h-100 bg-dark border border-info rounded">
+                    <div class="card-title text-center">
+                        <h2><span class="badge bg-info rounded-circle mt-2">#{{ application.pk }}</span> {{ application.subject }}</h2>
                     </div>
                     <div class="card-body">
-                        <ul class="fs-4">
+                        <ul>
                             <li>Приоритет: {{ application.priority|priority_application_translate }}</li>
-                            <li>Клиент: <a href="{{ application.client.get_absolute_url }}">{{ application.client.name }}</a></li>
-                            <li>Контакт: <a href="{{ application.contact_person.get_absolute_url }}">{{ application.contact_person.get_full_name }}</a></li>
-                            <li>Ответственный: {% if application.executor %}<a href="{{ application.executor.get_absolute_url }}">{{ application.executor.get_full_name }}</a>{% else %}-{% endif %}</li>
+                            <li>Клиент: {{ application.client.name }}</li>
+                            <li>Контакт: {{ application.contact_person.get_full_name }}</li>
+                            <li>Ответственный: {% if application.executor %}{{ application.executor.get_full_name }}{% else %}-{% endif %}</li>
                             <li>Дедлайн: {% if application.deadline %}{{ application.deadline }}{% else %}-{% endif %}</li>
                             <li>Статус: {{ application.status|status_application_translate }}</li>
                         </ul>
                     </div>
-                    {% if request.user.is_staff %}
-                    <div class="card-footer border-info">
+                    <div class="card-footer">
                         <div class="d-flex align-items-center">
                             <a href="{{ application.get_absolute_url }}" class="btn btn-info w-100">Подробнее</a>
                         </div>
                     </div>
-                    {% endif %}
                 </div>
             </div>
             {% empty %}

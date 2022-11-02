@@ -1,0 +1,39 @@
+<!-- Modal Equipment info -->
+<div class="modal modal-alert" tabindex="-1" role="dialog" id="show_equipment_data{{ eq.pk }}">
+    <div class="modal-dialog modal-dialog-centered" role="document">
+        <div class="modal-content rounded-4 shadow bg-info text-dark">
+            <div class="modal-header">
+                <h5 class="mb-0 text-center">Данные оборудования {{ eq.name }}</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body p-4 text-start bg-white">
+                <p class="fs-3 border-bottom">Тип: {{ eq.type.name }}</p>
+                <p class="fs-3">Атрибуты:</p>
+                <ul class="border-bottom">
+                    {% for attr in eq.attribute.all %}
+                    <li class="fs-2">
+                        {{ attr.name }}
+                    </li>
+                    {% endfor %}
+                </ul>
+                {% if eq.note %}<p class="fs-3 border-bottom">Заметки: {{ eq.note }}</p>{% endif %}
+            </div>
+            {% if eq.files.all.exists %}
+            <div class="modal-footer">
+                <h5 class="mb-0 text-center">Файлы:</h5>
+                {% for eq_file in eq.files.all %}
+                <div class="col mt-3">
+                    <a href="{{ eq_file.file.url }}" class="btn text-dark">
+                        {{ eq_file.title }}
+                        <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-file-earmark" viewBox="0 0 16 16">
+                            <path d="M14 4.5V14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V2a2 2 0 0 1 2-2h5.5L14 4.5zm-3 0A1.5 1.5 0 0 1 9.5 3V1H4a1 1 0 0 0-1 1v12a1 1 0 0 0 1 1h8a1 1 0 0 0 1-1V4.5h-2z"/>
+                        </svg>
+                    </a>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+<!-- Modal Equipment info -->

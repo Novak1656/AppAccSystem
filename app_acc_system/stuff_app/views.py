@@ -10,6 +10,7 @@ from django.urls import reverse_lazy
 from django.views.generic import CreateView, ListView
 from .forms import StuffUserCreateForm, StuffUserInfoForm, StuffUserLoginChangeForm, StuffUserLoginForm
 from .models import StuffUsers
+from client_app.services import chek_access_rights
 
 
 def is_staff_chek(user):
@@ -44,14 +45,13 @@ class StuffUsersListView(AccessMixin, ListView):
     login_url = reverse_lazy('stuff_user_auth')
     
     def dispatch(self, request, *args, **kwargs):
-        if request.user.role == 'executor':
-            raise Http404
+        chek_access_rights(request.user)
         return super(StuffUsersListView, self).dispatch(request, *args, **kwargs)
 
 
 @login_required
 def stuff_user_detail(request, username):
-    is_staff_chek(request.user)
+    chek_access_rights(request.user)
     executor = StuffUsers.objects.get(username=username)
     if request.method == 'POST':
         form = StuffUserInfoForm(request.POST, instance=executor)

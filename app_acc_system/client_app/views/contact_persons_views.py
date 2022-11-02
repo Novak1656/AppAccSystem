@@ -7,7 +7,7 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView
 
 from ..forms import ContactPersonsForms
 from ..models import ContactPersons, Clients
-from ..services import chek_is_staff
+from ..services import chek_access_rights
 
 
 class ContactPersonsListView(AccessMixin, ListView):
@@ -17,7 +17,7 @@ class ContactPersonsListView(AccessMixin, ListView):
     context_object_name = 'contact_persons'
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContactPersonsListView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -45,7 +45,7 @@ class ContactPersonCreateView(AccessMixin, CreateView):
         return super(ContactPersonCreateView, self).form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContactPersonCreateView, self).dispatch(request, *args, **kwargs)
 
 
@@ -56,7 +56,7 @@ class ContactPersonDetailView(AccessMixin, DetailView):
     login_url = reverse_lazy('stuff_user_auth')
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContactPersonDetailView, self).dispatch(request, *args, **kwargs)
 
 
@@ -70,7 +70,7 @@ class ContactPersonUpdateView(AccessMixin, UpdateView):
         return reverse_lazy('cp_detail', kwargs={'pk': self.object.pk})
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContactPersonUpdateView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -82,8 +82,7 @@ class ContactPersonUpdateView(AccessMixin, UpdateView):
 
 @login_required
 def contact_person_delete(request, cp_pk):
-    if not request.user.is_staff:
-        raise Http404
+    chek_access_rights(request.user)
     cp_obj = ContactPersons.objects.get(pk=cp_pk)
     client_slug = cp_obj.client.slug
     cp_obj.delete()

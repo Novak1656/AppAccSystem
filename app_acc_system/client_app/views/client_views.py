@@ -12,7 +12,7 @@ from django.views.generic import ListView, CreateView, DetailView, UpdateView
 
 from ..forms import ClientForm, ClientFilesForms
 from ..models import Clients, ClientFiles
-from ..services import chek_is_staff
+from ..services import chek_access_rights
 
 
 class ClientsListView(AccessMixin, ListView):
@@ -29,8 +29,7 @@ class ClientsListView(AccessMixin, ListView):
         )
 
     def dispatch(self, request, *args, **kwargs):
-        if request.user.role == 'executor':
-            raise Http404
+        chek_access_rights(request.user)
         return super(ClientsListView, self).dispatch(request, *args, **kwargs)
 
 
@@ -42,7 +41,7 @@ class ClientCreateView(AccessMixin, CreateView):
     form_class = ClientForm
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ClientCreateView, self).dispatch(request, *args, **kwargs)
 
 
@@ -54,7 +53,7 @@ class ClientDetailView(AccessMixin, DetailView):
     slug_url_kwarg = 'client_slug'
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ClientDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_queryset(self):
@@ -95,7 +94,7 @@ class ClientUpdateView(AccessMixin, UpdateView):
         return super(ClientUpdateView, self).form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ClientUpdateView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -107,7 +106,7 @@ class ClientUpdateView(AccessMixin, UpdateView):
 
 @login_required
 def client_delete_view(request, client_slug):
-    chek_is_staff(request.user)
+    chek_access_rights(request.user)
     client = Clients.objects.get(slug=client_slug).delete()
     if client.files.exists():
         files_path = os.path.join(settings.BASE_DIR, f"media/User_files/{client.name}/")
@@ -132,14 +131,13 @@ class ClientFilesCreateView(AccessMixin, CreateView):
         return super(ClientFilesCreateView, self).form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ClientFilesCreateView, self).dispatch(request, *args, **kwargs)
 
 
 @login_required
 def delete_client_file(request, file_slug):
-    if not request.user.is_staff:
-        raise Http404
+    chek_access_rights(request.user)
     client_file = get_object_or_404(ClientFiles, slug=file_slug)
     client_file.delete()
     return redirect(request.META['HTTP_REFERER'])

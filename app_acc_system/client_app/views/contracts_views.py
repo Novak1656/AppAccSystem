@@ -10,7 +10,7 @@ from django.views.generic import CreateView, UpdateView, DetailView, ListView
 
 from ..forms import ContractsFilesForms, ContractsForms
 from ..models import ContractFiles, Contracts, Clients
-from ..services import chek_is_staff
+from ..services import chek_access_rights
 
 
 class ContractsListView(AccessMixin, ListView):
@@ -23,7 +23,7 @@ class ContractsListView(AccessMixin, ListView):
         return Contracts.objects.select_related('client').filter(client__slug=self.kwargs['client_slug'])
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContractsListView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, *, object_list=None, **kwargs):
@@ -40,7 +40,7 @@ class ContractsDetailView(AccessMixin, DetailView):
     slug_url_kwarg = 'cont_slug'
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContractsDetailView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -65,7 +65,7 @@ class ContractsCreateView(AccessMixin, CreateView):
         return super(ContractsCreateView, self).form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContractsCreateView, self).dispatch(request, *args, **kwargs)
 
 
@@ -94,7 +94,7 @@ class ContractsUpdateView(AccessMixin, UpdateView):
         return super(ContractsUpdateView, self).form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContractsUpdateView, self).dispatch(request, *args, **kwargs)
 
     def get_context_data(self, **kwargs):
@@ -105,7 +105,7 @@ class ContractsUpdateView(AccessMixin, UpdateView):
 
 @login_required
 def contracts_delete_view(request, cont_slug):
-    chek_is_staff(request.user)
+    chek_access_rights(request.user)
     contract = get_object_or_404(Contracts, slug=cont_slug)
     client_slug = contract.client.slug
     if contract.files.exists():
@@ -132,13 +132,13 @@ class ContractFilesCreateView(AccessMixin, CreateView):
         return super(ContractFilesCreateView, self).form_valid(form)
 
     def dispatch(self, request, *args, **kwargs):
-        chek_is_staff(request.user)
+        chek_access_rights(request.user)
         return super(ContractFilesCreateView, self).dispatch(request, *args, **kwargs)
 
 
 @login_required
 def delete_cont_file(request, file_slug):
-    chek_is_staff(request.user)
+    chek_access_rights(request.user)
     file_obj = get_object_or_404(ContractFiles, slug=file_slug)
     cont_slug = file_obj.contract.slug
     file_obj.delete()
